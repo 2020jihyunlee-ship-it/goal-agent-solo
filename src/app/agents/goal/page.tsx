@@ -9,6 +9,7 @@ import AgentNavigator from '@/components/navigation/AgentNavigator'
 import { Message, Step } from '@/types'
 import { downloadPdf } from '@/lib/pdf'
 import CompetencyRadar from '@/components/visualization/CompetencyRadar'
+import { createClient } from '@/lib/supabase/client'
 import styles from './page.module.css'
 
 // React Flow는 SSR을 지원하지 않으므로 dynamic import
@@ -27,6 +28,7 @@ export default function NewSessionPage() {
     const [sessionId, setSessionId] = useState<string | null>(null)
     const [isDownloading, setIsDownloading] = useState(false)
     const [finalSummary, setFinalSummary] = useState<any>(null)
+    const [userName, setUserName] = useState<string>('')
 
     const handleDownloadPdf = async () => {
         setIsDownloading(true)
@@ -44,11 +46,16 @@ export default function NewSessionPage() {
     // 초기 세션 생성 및 환영 메시지
     useEffect(() => {
         const initSession = async () => {
+            const supabase = createClient()
+            const { data: { user } } = await supabase.auth.getUser()
+            const name = user?.user_metadata?.name || ''
+            setUserName(name)
+
             const welcomeMessage: Message = {
                 id: 'welcome',
                 session_id: 'new',
                 role: 'assistant',
-                content: '안녕하세요! 🎯 G-STAR 목표설정 코치입니다.\n\n어떤 원대한 목표를 가슴에 품고 계신가요? 아직은 막연해도 괜찮습니다. 대화를 나누며 당신만의 보석 같은 전략을 깎아나갈 거예요.',
+                content: `안녕하세요${name ? `, ${name}님` : ''}! 🎯 목표설정 코치입니다.\n\n어떤 목표를 가슴에 품고 계신가요? 아직은 막연해도 괜찮습니다. 대화를 나누며 ${name ? `${name}님만의` : '당신만의'} 목표를 함께 발견해볼게요.`,
                 step: 'input',
                 created_at: new Date().toISOString(),
             }
@@ -173,6 +180,12 @@ export default function NewSessionPage() {
                     </h1>
                 </div>
                 <div className={styles.headerActions}>
+                    {userName && (
+                        <div className={styles.userBadge}>
+                            <span className={styles.userAvatar}>{userName.charAt(0)}</span>
+                            <span className={styles.userName}>{userName}님</span>
+                        </div>
+                    )}
                     <button
                         className={styles.pdfButton}
                         onClick={handleDownloadPdf}
