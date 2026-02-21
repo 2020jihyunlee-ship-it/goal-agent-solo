@@ -22,7 +22,7 @@ export default function SignupPage() {
         setError(null)
         setLoading(true)
 
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
             email,
             password,
             options: {
@@ -38,8 +38,14 @@ export default function SignupPage() {
             return
         }
 
-        setSuccess(true)
-        setLoading(false)
+        if (data.session) {
+            // 이메일 인증 OFF → 세션 즉시 생성 → 바로 이동
+            router.push('/agents/goal')
+        } else {
+            // 이메일 인증 ON → 확인 안내 화면
+            setSuccess(true)
+            setLoading(false)
+        }
     }
 
     if (success) {
