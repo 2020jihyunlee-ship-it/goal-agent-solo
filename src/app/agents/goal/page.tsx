@@ -197,7 +197,7 @@ export default function NewSessionPage() {
     const stageInfo = getStageInfo(currentStep);
 
     return (
-        <main className={styles.main}>
+        <main className={styles.main} id="session-workspace">
             <header className={styles.header}>
                 <Link href="/" className={styles.backButton}>
                     ← 홈
