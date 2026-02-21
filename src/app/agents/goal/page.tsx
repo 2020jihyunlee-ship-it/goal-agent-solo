@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
@@ -29,6 +29,34 @@ export default function NewSessionPage() {
     const [isDownloading, setIsDownloading] = useState(false)
     const [finalSummary, setFinalSummary] = useState<any>(null)
     const [userName, setUserName] = useState<string>('')
+    const [splitPercent, setSplitPercent] = useState(50)
+    const [isDragging, setIsDragging] = useState(false)
+    const contentRef = useRef<HTMLDivElement>(null)
+
+    const handleResizerMouseDown = useCallback((e: React.MouseEvent) => {
+        e.preventDefault()
+        setIsDragging(true)
+    }, [])
+
+    useEffect(() => {
+        const handleMouseMove = (e: MouseEvent) => {
+            if (!isDragging || !contentRef.current) return
+            const rect = contentRef.current.getBoundingClientRect()
+            const x = e.clientX - rect.left
+            const percent = (x / rect.width) * 100
+            setSplitPercent(Math.min(Math.max(percent, 25), 75))
+        }
+        const handleMouseUp = () => setIsDragging(false)
+
+        if (isDragging) {
+            document.addEventListener('mousemove', handleMouseMove)
+            document.addEventListener('mouseup', handleMouseUp)
+        }
+        return () => {
+            document.removeEventListener('mousemove', handleMouseMove)
+            document.removeEventListener('mouseup', handleMouseUp)
+        }
+    }, [isDragging])
 
     const handleDownloadPdf = async () => {
         setIsDownloading(true)
@@ -201,9 +229,15 @@ export default function NewSessionPage() {
 
             <AgentNavigator currentStep="goal" />
 
-            <div className={styles.content}>
+            <div
+                className={`${styles.content} ${isDragging ? styles.dragging : ''}`}
+                ref={contentRef}
+            >
                 {/* LEFT: Communication (Chat) */}
-                <section className={styles.chatSection}>
+                <section
+                    className={styles.chatSection}
+                    style={{ width: `${splitPercent}%` }}
+                >
                     <ChatContainer
                         messages={messages}
                         onSendMessage={handleSendMessage}
@@ -211,8 +245,19 @@ export default function NewSessionPage() {
                     />
                 </section>
 
+                {/* RESIZER */}
+                <div
+                    className={`${styles.resizer} ${isDragging ? styles.resizerActive : ''}`}
+                    onMouseDown={handleResizerMouseDown}
+                >
+                    <div className={styles.resizerHandle} />
+                </div>
+
                 {/* RIGHT: Visualisation (Canvas) */}
-                <aside className={styles.sidebar}>
+                <aside
+                    className={styles.sidebar}
+                    style={{ width: `${100 - splitPercent}%` }}
+                >
                     <div className={styles.canvasHeader}>
                         <div className={styles.canvasTitle}>Strategic Evolution Canvas</div>
                         <div className={styles.canvasStatus}>LIVE ANALYSIS ENABLED</div>
