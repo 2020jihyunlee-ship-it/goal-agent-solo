@@ -29,6 +29,10 @@ export default function NewSessionPage() {
     const [isDownloading, setIsDownloading] = useState(false)
     const [finalSummary, setFinalSummary] = useState<any>(null)
     const [userName, setUserName] = useState<string>('')
+    const [userEmail, setUserEmail] = useState<string>('')
+    const [isLimitReached, setIsLimitReached] = useState(false)
+    const [waitlistDone, setWaitlistDone] = useState(false)
+    const [waitlistLoading, setWaitlistLoading] = useState(false)
     const [splitPercent, setSplitPercent] = useState(50)
     const [isDragging, setIsDragging] = useState(false)
     const contentRef = useRef<HTMLDivElement>(null)
@@ -77,7 +81,23 @@ export default function NewSessionPage() {
             const supabase = createClient()
             const { data: { user } } = await supabase.auth.getUser()
             const name = user?.user_metadata?.name || ''
+            const email = user?.email || ''
             setUserName(name)
+            setUserEmail(email)
+
+            // 이번 달 완료 세션 수 확인
+            const startOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString()
+            const { count } = await supabase
+                .from('goal_sessions')
+                .select('*', { count: 'exact', head: true })
+                .eq('user_id', user?.id)
+                .eq('status', 'completed')
+                .gte('completed_at', startOfMonth)
+
+            if ((count || 0) >= 3) {
+                setIsLimitReached(true)
+                return
+            }
 
             const welcomeMessage: Message = {
                 id: 'welcome',
@@ -195,6 +215,72 @@ export default function NewSessionPage() {
     }
 
     const stageInfo = getStageInfo(currentStep);
+
+    const handleWaitlist = async () => {
+        setWaitlistLoading(true)
+        try {
+            await fetch('/api/waitlist', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+            })
+            setWaitlistDone(true)
+        } finally {
+            setWaitlistLoading(false)
+        }
+    }
+
+    if (isLimitReached) {
+        return (
+            <main className={styles.main}>
+                <header className={styles.header}>
+                    <Link href="/" className={styles.backButton}>← 홈</Link>
+                    <div className={styles.titleGroup}>
+                        <h1 className={styles.title}>
+                            <span className="text-gradient">KINGCLE</span> <span style={{ color: '#7df9ff', fontStyle: 'italic', fontWeight: 800 }}>AI</span> COACH
+                        </h1>
+                    </div>
+                    <div className={styles.headerActions}>
+                        {userName && (
+                            <div className={styles.userBadge}>
+                                <span className={styles.userAvatar}>{userName.charAt(0)}</span>
+                                <span className={styles.userName}>{userName}님</span>
+                            </div>
+                        )}
+                        <a href="/api/auth/signout" className={styles.logoutButton}>로그아웃</a>
+                    </div>
+                </header>
+                <div className={styles.limitGate}>
+                    <div className={styles.limitCard}>
+                        <div className={styles.limitIcon}>🔒</div>
+                        <h2 className={styles.limitTitle}>이번 달 무료 이용 횟수를 모두 사용했습니다</h2>
+                        <p className={styles.limitDesc}>
+                            무료 플랜은 매달 <strong>3회</strong> 목표 코칭을 제공합니다.<br />
+                            다음 달 1일에 횟수가 초기화됩니다.
+                        </p>
+                        <div className={styles.limitDivider} />
+                        <p className={styles.limitPremiumDesc}>
+                            <strong>프리미엄 플랜</strong>이 곧 출시됩니다.<br />
+                            무제한 코칭 · 히스토리 보기 · PDF 리포트
+                        </p>
+                        {waitlistDone ? (
+                            <div className={styles.waitlistSuccess}>
+                                ✅ 출시 알림 신청 완료!<br />
+                                <span>{userEmail} 로 안내해드릴게요.</span>
+                            </div>
+                        ) : (
+                            <button
+                                className={styles.waitlistButton}
+                                onClick={handleWaitlist}
+                                disabled={waitlistLoading}
+                            >
+                                {waitlistLoading ? '신청 중...' : '🔔 프리미엄 출시 알림 신청하기'}
+                            </button>
+                        )}
+                    </div>
+                </div>
+            </main>
+        )
+    }
 
     return (
         <main className={styles.main} id="session-workspace">
