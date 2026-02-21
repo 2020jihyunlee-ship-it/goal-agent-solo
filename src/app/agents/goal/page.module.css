@@ -549,6 +549,43 @@
 }
 
 /* 한도 초과 게이트 */
+.sessionQuota {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-xs) var(--space-md);
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-full);
+}
+
+.quotaDots {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+}
+
+.quotaDotFree {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--color-primary);
+    opacity: 0.8;
+}
+
+.quotaDotUsed {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.quotaText {
+    font-size: 12px;
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+}
+
 .limitGate {
     flex: 1;
     display: flex;

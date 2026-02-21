@@ -31,6 +31,7 @@ export default function NewSessionPage() {
     const [userName, setUserName] = useState<string>('')
     const [userEmail, setUserEmail] = useState<string>('')
     const [isLimitReached, setIsLimitReached] = useState(false)
+    const [sessionCount, setSessionCount] = useState<number>(0)
     const [waitlistDone, setWaitlistDone] = useState(false)
     const [waitlistLoading, setWaitlistLoading] = useState(false)
     const [splitPercent, setSplitPercent] = useState(50)
@@ -88,6 +89,7 @@ export default function NewSessionPage() {
             // 이번 달 완료 세션 수 확인 (서버 API 통해 RLS 우회)
             const res = await fetch('/api/session/count')
             const { count } = await res.json()
+            setSessionCount(count)
 
             if (count >= 3) {
                 setIsLimitReached(true)
@@ -295,6 +297,16 @@ export default function NewSessionPage() {
                             <span className={styles.userName}>{userName}님</span>
                         </div>
                     )}
+                    <div className={styles.sessionQuota}>
+                        <span className={styles.quotaDots}>
+                            {[0, 1, 2].map(i => (
+                                <span key={i} className={i < sessionCount ? styles.quotaDotUsed : styles.quotaDotFree} />
+                            ))}
+                        </span>
+                        <span className={styles.quotaText}>
+                            이번 달 {Math.max(0, 3 - sessionCount)}회 남음
+                        </span>
+                    </div>
                     <button
                         className={styles.pdfButton}
                         onClick={handleDownloadPdf}
