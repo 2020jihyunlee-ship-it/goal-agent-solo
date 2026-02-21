@@ -224,6 +224,16 @@ export default function NewSessionPage() {
                     {isCompleted && (
                         <span className={styles.completedBadge}>✓ 설계 완료</span>
                     )}
+                    <button
+                        className={styles.logoutButton}
+                        onClick={async () => {
+                            const supabase = createClient()
+                            await supabase.auth.signOut()
+                            router.push('/')
+                        }}
+                    >
+                        로그아웃
+                    </button>
                 </div>
             </header>
 

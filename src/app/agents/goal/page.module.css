@@ -548,6 +548,24 @@
     color: var(--color-primary);
 }
 
+.logoutButton {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--space-xs) var(--space-md);
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: var(--radius-md);
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-sm);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.logoutButton:hover {
+    border-color: rgba(255, 80, 80, 0.5);
+    color: #ff6b6b;
+}
+
 /* 반응형 */
 @media (max-width: 768px) {
     .content {
