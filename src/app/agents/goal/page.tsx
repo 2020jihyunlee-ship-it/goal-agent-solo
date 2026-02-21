@@ -85,16 +85,11 @@ export default function NewSessionPage() {
             setUserName(name)
             setUserEmail(email)
 
-            // 이번 달 완료 세션 수 확인
-            const startOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString()
-            const { count } = await supabase
-                .from('goal_sessions')
-                .select('*', { count: 'exact', head: true })
-                .eq('user_id', user?.id)
-                .eq('status', 'completed')
-                .gte('completed_at', startOfMonth)
+            // 이번 달 완료 세션 수 확인 (서버 API 통해 RLS 우회)
+            const res = await fetch('/api/session/count')
+            const { count } = await res.json()
 
-            if ((count || 0) >= 3) {
+            if (count >= 3) {
                 setIsLimitReached(true)
                 return
             }
