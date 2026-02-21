@@ -95,6 +95,11 @@ export default function LoginPage() {
                     </form>
 
                     <div className={styles.formFooter}>
+                        <Link href="/forgot-password" className={styles.link}>
+                            비밀번호를 잊으셨나요?
+                        </Link>
+                    </div>
+                    <div className={styles.formFooter}>
                         계정이 없으신가요?{' '}
                         <Link href="/signup" className={styles.link}>
                             회원가입
