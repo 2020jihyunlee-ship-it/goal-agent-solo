@@ -1,0 +1,93 @@
+.container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background: var(--color-bg-secondary);
+    border-right: 1px solid var(--color-border);
+}
+
+.container.compact {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+.header {
+    padding: var(--space-lg);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.title {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    color: var(--color-text-primary);
+}
+
+.graphWrapper {
+    flex: 1;
+    min-height: 0;
+}
+
+.nodeContent {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.nodeIcon {
+    font-size: 1.5rem;
+}
+
+.nodeLabel {
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.currentIndicator {
+    font-size: 0.625rem;
+    padding: 2px 8px;
+    background: var(--color-primary);
+    border-radius: 9999px;
+    color: white;
+    margin-top: 4px;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.6;
+    }
+}
+
+/* React Flow 스타일 오버라이드 */
+.graphWrapper :global(.react-flow__background) {
+    background: transparent;
+}
+
+.graphWrapper :global(.react-flow__controls) {
+    background: var(--color-bg-tertiary);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    box-shadow: none;
+}
+
+.graphWrapper :global(.react-flow__controls-button) {
+    background: transparent;
+    border: none;
+    color: var(--color-text-secondary);
+}
+
+.graphWrapper :global(.react-flow__controls-button:hover) {
+    background: var(--color-bg-glass);
+}
+
+.graphWrapper :global(.react-flow__controls-button svg) {
+    fill: currentColor;
+}

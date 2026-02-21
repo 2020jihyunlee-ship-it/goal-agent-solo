@@ -1,0 +1,59 @@
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    margin: 0 auto;
+}
+
+.svg {
+    filter: drop-shadow(0 0 10px rgba(125, 249, 255, 0.2));
+}
+
+.gridLine {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.05);
+    stroke-width: 1;
+}
+
+.axis {
+    stroke: rgba(255, 255, 255, 0.1);
+    stroke-width: 1;
+    stroke-dasharray: 4 4;
+}
+
+.dataArea {
+    fill: rgba(125, 249, 255, 0.2);
+    stroke: #7df9ff;
+    stroke-width: 2;
+    filter: drop-shadow(0 0 8px rgba(125, 249, 255, 0.5));
+    animation: fadeIn 1s ease-out;
+}
+
+.dataPoint {
+    fill: #7df9ff;
+    stroke: white;
+    stroke-width: 1;
+    filter: drop-shadow(0 0 5px #7df9ff);
+}
+
+.label {
+    fill: var(--color-text-secondary);
+    font-size: 12px;
+    font-weight: 700;
+    font-family: var(--font-inter);
+    letter-spacing: -0.02em;
+    text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}

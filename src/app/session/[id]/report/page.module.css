@@ -1,0 +1,398 @@
+.main {
+    min-height: 100vh;
+    background: #050508;
+    color: white;
+}
+
+.loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    color: var(--color-text-secondary);
+}
+
+.header {
+    background: rgba(18, 18, 26, 0.8);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding: var(--space-xl) 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.header .container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 var(--space-xl);
+}
+
+.backLink {
+    color: #a1a1aa;
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    transition: all var(--transition-fast);
+}
+
+.backLink:hover {
+    color: #7df9ff;
+}
+
+.title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+}
+
+.pdfButton {
+    padding: 10px 24px;
+    background: linear-gradient(135deg, #7df9ff 0%, #3b82f6 100%);
+    border-radius: var(--radius-full);
+    color: #050508;
+    font-size: var(--font-size-sm);
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 0 20px rgba(125, 249, 255, 0.3);
+}
+
+.pdfButton:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 30px rgba(125, 249, 255, 0.5);
+}
+
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: var(--space-3xl) var(--space-xl);
+}
+
+/* Strategic Header (PDF Cover feel) */
+.reportCover {
+    margin-bottom: var(--space-3xl);
+    border-left: 6px solid #d4af37;
+    padding-left: var(--space-xl);
+}
+
+.reportCover h1 {
+    font-size: 3rem;
+    line-height: 1.1;
+    margin-bottom: var(--space-sm);
+}
+
+.reportCover p {
+    font-size: var(--font-size-lg);
+    color: #a1a1aa;
+}
+
+/* Score Card */
+.scoreCard {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: var(--radius-2xl);
+    padding: var(--space-2xl);
+    display: grid;
+    grid-template-columns: 350px 1fr;
+    gap: var(--space-3xl);
+    margin-bottom: var(--space-3xl);
+    position: relative;
+    overflow: hidden;
+}
+
+.scoreCard::after {
+    content: 'OFFICIAL DIAGNOSIS';
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 0.6rem;
+    font-weight: 900;
+    color: rgba(255, 255, 255, 0.1);
+    letter-spacing: 3px;
+}
+
+.analysisVisual {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-xl);
+}
+
+.totalScoreCompact {
+    text-align: center;
+}
+
+.scoreLabel {
+    font-size: 0.7rem;
+    font-weight: 900;
+    color: #a1a1aa;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+}
+
+.scoreNumber {
+    font-size: 4rem;
+    font-weight: 900;
+    line-height: 1;
+    margin-bottom: 8px;
+    text-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+}
+
+.gradeBadge {
+    display: inline-block;
+    padding: 4px 16px;
+    background: #d4af37;
+    color: #050508;
+    border-radius: 4px;
+    font-weight: 900;
+    font-size: 1rem;
+}
+
+.scoreBars {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xl);
+    justify-content: center;
+}
+
+.barsTitle {
+    font-size: 0.8rem;
+    font-weight: 900;
+    color: #d4af37;
+    letter-spacing: 2px;
+    margin-bottom: var(--space-md);
+}
+
+.scoreItem {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.scoreHeader {
+    display: flex;
+    justify-content: space-between;
+}
+
+.scoreName {
+    font-weight: 700;
+    color: #e4e4e7;
+}
+
+.scoreValue {
+    font-weight: 800;
+    color: #7df9ff;
+}
+
+.scoreBarBg {
+    height: 6px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.scoreBarFill {
+    height: 100%;
+    border-radius: 3px;
+    box-shadow: 0 0 10px currentColor;
+}
+
+/* Sections */
+.section {
+    margin-bottom: var(--space-3xl);
+}
+
+.section h2 {
+    font-size: 1.5rem;
+    font-weight: 900;
+    margin-bottom: var(--space-xl);
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.section h2::before {
+    content: '';
+    width: 24px;
+    height: 2px;
+    background: #d4af37;
+}
+
+/* Content Cards */
+.goalSummary {
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: var(--radius-2xl);
+    padding: var(--space-2xl);
+}
+
+.goalItem {
+    padding: var(--space-lg) 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.goalItem:first-child {
+    padding-top: 0;
+}
+
+.goalItem:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.goalLabel {
+    font-size: 0.7rem;
+    font-weight: 900;
+    color: #d4af37;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+    display: block;
+}
+
+.goalText {
+    font-size: 1.1rem;
+    line-height: 1.5;
+    color: #e4e4e7;
+}
+
+.finalGoal {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: white !important;
+    text-shadow: 0 0 20px rgba(125, 249, 255, 0.3);
+}
+
+/* Analysis */
+.analysisGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-xl);
+}
+
+.analysisCard {
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: var(--radius-xl);
+    padding: var(--space-xl);
+    border: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.analysisCard h3 {
+    font-size: 1rem;
+    font-weight: 800;
+    margin-bottom: var(--space-lg);
+    color: #7df9ff;
+}
+
+.analysisCard ul {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.analysisCard li {
+    font-size: 0.95rem;
+    color: #a1a1aa;
+    position: relative;
+    padding-left: 20px;
+    line-height: 1.5;
+}
+
+.analysisCard li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: #d4af37;
+}
+
+/* Next Steps */
+.nextSteps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--space-lg);
+}
+
+.stepItem {
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    display: flex;
+    gap: var(--space-lg);
+    border: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.stepNum {
+    font-size: var(--font-size-2xl);
+    font-weight: 900;
+    color: #d4af37;
+    line-height: 1;
+}
+
+.stepItem p {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: #e4e4e7;
+}
+
+/* Footer Actions */
+.actions {
+    margin-top: var(--space-4xl);
+    display: flex;
+    justify-content: center;
+    gap: var(--space-lg);
+}
+
+.date {
+    margin-top: var(--space-3xl);
+    text-align: center;
+    font-size: 0.8rem;
+    color: #71717a;
+    font-weight: 600;
+    letter-spacing: 1px;
+}
+
+/* PDF Print Optimizations */
+@media print {
+    .main {
+        background: #050508 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .header,
+    .actions {
+        display: none !important;
+    }
+
+    .container {
+        padding: 0;
+        width: 100%;
+        max-width: none;
+    }
+
+    .scoreCard,
+    .goalSummary,
+    .analysisCard,
+    .stepItem {
+        break-inside: avoid;
+        background: rgba(255, 255, 255, 0.04) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    }
+
+    @page {
+        margin: 20mm;
+        size: A4;
+    }
+}
+
+@media (max-width: 768px) {
+    .scoreCard {
+        grid-template-columns: 1fr;
+    }
+
+    .analysisGrid {
+        grid-template-columns: 1fr;
+    }
+}

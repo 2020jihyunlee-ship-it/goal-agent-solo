@@ -1,0 +1,634 @@
+.main {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-lg);
+    padding: var(--space-md) var(--space-lg);
+    background: var(--color-bg-secondary);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.backButton {
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-sm);
+    transition: color var(--transition-fast);
+}
+
+.backButton:hover {
+    color: var(--color-primary);
+}
+
+.title {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    flex: 1;
+}
+
+.completedBadge {
+    padding: var(--space-xs) var(--space-md);
+    background: rgba(34, 197, 94, 0.1);
+    color: var(--color-success);
+    border-radius: var(--radius-full);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+}
+
+.content {
+    flex: 1;
+    display: flex;
+    min-height: 0;
+    gap: 0;
+    position: relative;
+    overflow: hidden;
+    background: #0a0a0f;
+}
+
+/* LEFT: Chat Section (50%) */
+/* LEFT: Chat Section (50%) */
+.chatSection {
+    flex: 0 0 50%;
+    max-width: 50%;
+    min-width: 50%;
+    border-right: 1px solid var(--color-border);
+    background: rgba(10, 10, 25, 0.5);
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+}
+
+/* RIGHT: Visualization Sidebar (50%) */
+/* RIGHT: Visualization Sidebar (50%) */
+.sidebar {
+    flex: 0 0 50%;
+    max-width: 50%;
+    min-width: 50%;
+    background: radial-gradient(circle at 70% 30%, rgba(30, 30, 60, 1) 0%, rgba(10, 10, 25, 1) 100%);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+    box-sizing: border-box;
+}
+
+.canvasHeader {
+    padding: var(--space-md) var(--space-lg);
+    background: rgba(255, 255, 255, 0.02);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 10;
+}
+
+.canvasTitle {
+    font-size: var(--font-size-xs);
+    font-weight: 700;
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.canvasStatus {
+    padding: 4px 12px;
+    background: rgba(125, 249, 255, 0.1);
+    border-radius: 4px;
+    font-size: 0.7rem;
+    color: #7df9ff;
+    font-weight: 700;
+}
+
+.visualizationArea {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: var(--space-xl);
+    gap: var(--space-xl);
+    overflow-y: auto;
+}
+
+.insightCard {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(125, 249, 255, 0.1);
+    border-radius: var(--radius-lg);
+    padding: var(--space-lg);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.insightHeader {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    font-size: 0.7rem;
+    font-weight: 800;
+    color: #7df9ff;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: var(--space-md);
+}
+
+.insightDot {
+    width: 6px;
+    height: 6px;
+    background: #7df9ff;
+    border-radius: 50%;
+    box-shadow: 0 0 10px #7df9ff;
+    animation: blink 2s infinite;
+}
+
+.insightContent {
+    color: white;
+}
+
+.phaseInfo h3 {
+    font-size: var(--font-size-lg);
+    margin-bottom: var(--space-sm);
+    color: #fff;
+}
+
+.phaseInfo p {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+}
+
+.finalHighlight {
+    border-left: 3px solid #d4af37;
+    padding-left: var(--space-md);
+}
+
+.highlightTitle {
+    font-size: 0.7rem;
+    color: #d4af37;
+    font-weight: 800;
+    margin-bottom: 4px;
+}
+
+.highlightText {
+    font-size: 1.2rem;
+    font-weight: 700;
+    line-height: 1.4;
+}
+
+@keyframes blink {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.3;
+    }
+}
+
+
+.canvasTitle {
+    font-size: var(--font-size-sm);
+    font-weight: 700;
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.visionBoard {
+    flex: 1;
+    position: relative;
+    padding: var(--space-2xl);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Strategic Pipeline Container */
+.pipeline {
+    position: relative;
+    width: 100%;
+    max-width: 900px;
+    height: 300px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Central Energy Path */
+.energyPath {
+    position: absolute;
+    top: 50%;
+    left: 40px;
+    right: 40px;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.05);
+    transform: translateY(-50%);
+    overflow: hidden;
+}
+
+.pathProgress {
+    height: 100%;
+    background: linear-gradient(90deg, transparent, #7df9ff, #d4af37, transparent);
+    background-size: 200% auto;
+    width: 0%;
+    transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: pathGlow 2s linear infinite;
+}
+
+@keyframes pathGlow {
+    to {
+        background-position: 200% center;
+    }
+}
+
+/* Pipeline Nodes */
+.node {
+    position: relative;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: all 0.5s ease;
+    cursor: default;
+}
+
+.nodeCircle {
+    width: 60px;
+    height: 60px;
+    background: rgba(10, 10, 25, 1);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+}
+
+.nodeLabel {
+    margin-top: var(--space-md);
+    font-size: var(--font-size-xs);
+    font-weight: 700;
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.5s ease;
+    text-align: center;
+}
+
+/* Active Node States */
+.activeNode .nodeCircle {
+    border-color: #7df9ff;
+    color: #7df9ff;
+    box-shadow: 0 0 30px rgba(125, 249, 255, 0.4);
+    transform: scale(1.2);
+}
+
+.activeNode .nodeLabel {
+    color: white;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+/* Completed Node States */
+.completedNode .nodeCircle {
+    border-color: #22c55e;
+    color: #22c55e;
+    background: rgba(34, 197, 94, 0.1);
+}
+
+.completedNode .nodeLabel {
+    color: #22c55e;
+}
+
+/* Current Focus Indicator */
+.activeNode::after {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    right: -10px;
+    bottom: -10px;
+    border-radius: 50%;
+    border: 2px solid #7df9ff;
+    opacity: 0.3;
+    animation: nodePulse 2s infinite;
+}
+
+@keyframes nodePulse {
+    0% {
+        transform: scale(1);
+        opacity: 0.5;
+    }
+
+    100% {
+        transform: scale(1.5);
+        opacity: 0;
+    }
+}
+
+/* Content Snapshot Card */
+.snapshotCard {
+    margin-top: var(--space-2xl);
+    width: 100%;
+    max-width: 500px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: var(--radius-xl);
+    padding: var(--space-lg);
+    backdrop-filter: blur(10px);
+    animation: slideUp 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.snapshotHeader {
+    font-size: var(--font-size-xs);
+    font-weight: 800;
+    color: #7df9ff;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: var(--space-sm);
+}
+
+.snapshotBody {
+    font-size: 1.1rem;
+    color: white;
+    line-height: 1.6;
+    font-weight: 500;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* SMART Labels (for the last node) */
+.activeNode .smartLabel {
+    position: absolute;
+    font-size: 0.6rem;
+    color: #d4af37;
+    white-space: nowrap;
+    animation: float 3s infinite;
+}
+
+.labelS {
+    top: -40px;
+}
+
+.labelM {
+    top: -20px;
+    right: -60px;
+}
+
+.labelA {
+    bottom: -20px;
+    right: -60px;
+}
+
+.labelR {
+    bottom: -40px;
+}
+
+.labelT {
+    top: -20px;
+    left: -60px;
+}
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-5px);
+    }
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+        opacity: 0.8;
+    }
+
+    50% {
+        transform: scale(1.2);
+        opacity: 1;
+        filter: drop-shadow(0 0 20px #d4af37);
+    }
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Header Actions */
+.headerActions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+}
+
+.pdfButton {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: var(--space-xs) var(--space-md);
+    background: var(--color-bg-glass);
+    color: var(--color-text-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.pdfButton:hover {
+    background: rgba(125, 249, 255, 0.1);
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+    .content {
+        flex-direction: column;
+    }
+
+    .chatSection {
+        width: 100% !important;
+        height: 50%;
+        border-right: none;
+        border-bottom: 1px solid var(--color-border);
+    }
+
+    .canvasSection {
+        height: 50%;
+    }
+}
+
+/* Final Analysis Card Styles */
+.finalAnalysisCard {
+    max-width: 650px !important;
+    border-color: rgba(212, 175, 55, 0.3) !important;
+    background: rgba(10, 10, 25, 0.8) !important;
+    box-shadow: 0 0 50px rgba(212, 175, 55, 0.1);
+}
+
+.reportContent {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+}
+
+.finalGoalSummary {
+    margin-bottom: var(--space-md);
+}
+
+.summaryLabel {
+    font-size: 0.7rem;
+    color: #d4af37;
+    font-weight: 800;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+}
+
+.summaryText {
+    font-size: 1.4rem;
+    color: white;
+    font-weight: 700;
+    line-height: 1.4;
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+}
+
+.smartAnalysis {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: var(--space-md);
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: var(--radius-md);
+}
+
+.smartRow {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.smartRow strong {
+    color: #7df9ff;
+    margin-right: 8px;
+}
+
+.reportVisualGrid {
+    display: grid;
+    grid-template-columns: 1fr 200px;
+    gap: var(--space-xl);
+    align-items: center;
+}
+
+.miniRadar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: var(--radius-lg);
+    padding: var(--space-sm);
+}
+
+@media (max-width: 600px) {
+    .reportVisualGrid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.rootCauseBox {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.6);
+    font-style: italic;
+    padding-top: var(--space-md);
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.rootCauseBox strong {
+    color: #d4af37;
+    font-style: normal;
+    margin-right: 8px;
+}
+
+/* Final Report styles for PDF */
+.finalReport {
+    margin-top: var(--space-2xl);
+    padding: var(--space-2xl);
+    background: white;
+    color: #1a1a24;
+    border-radius: var(--radius-lg);
+    width: 100%;
+    display: none;
+    /* Hide in normal view, use for PDF context if needed */
+}
+
+@media print {
+    .finalReport {
+        display: block !important;
+    }
+}
+
+.reportSection {
+    margin-bottom: var(--space-xl);
+}
+
+.reportSection h3 {
+    font-size: 1rem;
+    color: var(--color-primary);
+    border-bottom: 2px solid var(--color-border);
+    padding-bottom: var(--space-xs);
+    margin-bottom: var(--space-sm);
+}
+
+/* 인쇄용 스타일 */
+@media print {
+    .main {
+        height: auto;
+        overflow: visible;
+    }
+
+    .header {
+        background: white;
+        border-bottom: 2px solid #333;
+        padding: 1rem;
+    }
+
+    .backButton,
+    .pdfButton,
+    .headerActions button {
+        display: none !important;
+    }
+
+    .chatSection {
+        display: none !important;
+    }
+
+    .content {
+        display: block;
+    }
+}
