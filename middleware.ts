@@ -32,7 +32,7 @@ export async function middleware(request: NextRequest) {
     } = await supabase.auth.getUser()
 
     // 보호된 경로 확인
-    const protectedPaths = ['/dashboard', '/session']
+    const protectedPaths = ['/agents', '/session']
     const isProtectedPath = protectedPaths.some(path =>
         request.nextUrl.pathname.startsWith(path)
     )
@@ -44,7 +44,7 @@ export async function middleware(request: NextRequest) {
         return NextResponse.redirect(url)
     }
 
-    // 이미 로그인한 사용자가 로그인/회원가입 페이지에 접근하면 대시보드로 리다이렉트
+    // 이미 로그인한 사용자가 로그인/회원가입 페이지에 접근하면 Goal Agent로 리다이렉트
     const authPaths = ['/login', '/signup']
     const isAuthPath = authPaths.some(path =>
         request.nextUrl.pathname === path
@@ -52,7 +52,7 @@ export async function middleware(request: NextRequest) {
 
     if (isAuthPath && user) {
         const url = request.nextUrl.clone()
-        url.pathname = '/dashboard'
+        url.pathname = '/agents/goal'
         return NextResponse.redirect(url)
     }
 
