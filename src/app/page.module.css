@@ -94,6 +94,12 @@
   color: var(--color-text-muted);
 }
 
+.loginLink {
+  color: var(--color-primary-light);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 /* Hero Visual (Chat Preview) */
 .heroVisual {
   display: flex;

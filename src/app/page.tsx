@@ -90,15 +90,15 @@ export default function Home() {
           </div>
 
           <div className={styles.heroCta}>
-            <Link href="/agents/goal" className="btn btn-primary btn-lg">
-              목표 탐색 시작하기
-            </Link>
-            <Link href="/login" className="btn btn-secondary btn-lg">
-              로그인
+            <Link href="/signup" className="btn btn-primary btn-lg">
+              무료로 시작하기
             </Link>
           </div>
 
-          <p className={styles.heroNote}>5분 대화로 SMART 목표 완성 · 무료</p>
+          <p className={styles.heroNote}>
+            5분 대화로 SMART 목표 완성 · 무료 ·{' '}
+            <Link href="/login" className={styles.loginLink}>이미 계정이 있어요</Link>
+          </p>
         </div>
 
         <div className={styles.heroVisual}>
@@ -194,10 +194,10 @@ export default function Home() {
         <div className={styles.ctaCard}>
           <h2>지금 바로 탐색을 시작하세요</h2>
           <p>5분의 대화로 당신만의 SMART 목표가 완성됩니다</p>
-          <Link href="/agents/goal" className="btn btn-primary btn-lg">
-            목표 탐색 시작하기
+          <Link href="/signup" className="btn btn-primary btn-lg">
+            무료로 시작하기
           </Link>
-          <p className={styles.ctaNote}>로그인 없이 대화 시작 가능 · 결과 저장 시 계정 필요</p>
+          <p className={styles.ctaNote}>회원가입 후 바로 시작 · 무료</p>
         </div>
       </section>
 
@@ -205,8 +205,8 @@ export default function Home() {
       <footer className={styles.footer}>
         <p>© 2026 Kingcle Expansion OS · Goal Agent</p>
         <div className={styles.footerLinks}>
+          <Link href="/signup">무료 회원가입</Link>
           <Link href="/login">로그인</Link>
-          <Link href="/signup">회원가입</Link>
         </div>
       </footer>
     </main>
