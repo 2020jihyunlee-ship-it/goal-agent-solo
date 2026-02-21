@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback } from 'react'
+import { useCallback, useRef, useEffect } from 'react'
 import ReactFlow, {
     Node,
     Edge,
@@ -45,6 +45,19 @@ function getStatusColor(status: NodeStatus): string {
 }
 
 export default function WorkflowGraph({ currentStep, completedSteps, compact = false }: WorkflowGraphProps) {
+    const rfInstance = useRef<any>(null)
+    const wrapperRef = useRef<HTMLDivElement>(null)
+
+    // 컨테이너 크기 변화 감지 → fitView 재실행
+    useEffect(() => {
+        if (!wrapperRef.current) return
+        const observer = new ResizeObserver(() => {
+            rfInstance.current?.fitView({ padding: 0.2, duration: 200 })
+        })
+        observer.observe(wrapperRef.current)
+        return () => observer.disconnect()
+    }, [])
+
     const nodes: Node[] = stepConfig.map((step, index) => {
         const status = getNodeStatus(step.id, currentStep, completedSteps)
         const isCurrent = status === 'current'
@@ -120,12 +133,13 @@ export default function WorkflowGraph({ currentStep, completedSteps, compact = f
     })
 
     const onInit = useCallback((instance: any) => {
+        rfInstance.current = instance
         instance.fitView({ padding: 0.2 })
     }, [])
 
     return (
         <div className={`${styles.container} ${compact ? styles.compact : ''}`}>
-            <div className={styles.graphWrapper}>
+            <div className={styles.graphWrapper} ref={wrapperRef}>
                 <ReactFlow
                     nodes={nodes}
                     edges={edges}
