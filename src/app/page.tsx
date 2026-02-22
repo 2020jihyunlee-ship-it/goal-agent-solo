@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import styles from './page.module.css'
+import AdminDemoButton from '@/components/AdminDemoButton'
 
 const pillars = [
   {
@@ -205,6 +206,7 @@ export default function Home() {
       <footer className={styles.footer}>
         <p>© 2026 Kingcle Expansion OS · Goal Agent</p>
         <div className={styles.footerLinks}>
+          <AdminDemoButton />
           <Link href="/signup">무료 회원가입</Link>
           <Link href="/login">로그인</Link>
         </div>
