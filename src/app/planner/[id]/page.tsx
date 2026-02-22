@@ -326,29 +326,41 @@ export default function PlannerPage({ params }: { params: Promise<{ id: string }
         await fetch(`/api/planner/milestones/${id}`, { method: 'DELETE' })
     }, [])
 
-    const handleMoveMilestone = useCallback(async (id: string, direction: 'up' | 'down') => {
+    const [dragIndex, setDragIndex] = useState<number | null>(null)
+    const [dragOverIndex, setDragOverIndex] = useState<number | null>(null)
+
+    const handleDragStart = useCallback((idx: number) => setDragIndex(idx), [])
+
+    const handleDragOver = useCallback((e: React.DragEvent, idx: number) => {
+        e.preventDefault()
+        setDragOverIndex(idx)
+    }, [])
+
+    const handleDrop = useCallback(async (dropIdx: number) => {
+        if (dragIndex === null || dragIndex === dropIdx) {
+            setDragIndex(null)
+            setDragOverIndex(null)
+            return
+        }
         setMilestones(prev => {
-            const idx = prev.findIndex(m => m.id === id)
-            const swapIdx = direction === 'up' ? idx - 1 : idx + 1
-            if (swapIdx < 0 || swapIdx >= prev.length) return prev
             const next = [...prev]
-            const aOrder = next[idx].order_index
-            const bOrder = next[swapIdx].order_index
-            next[idx] = { ...next[idx], order_index: bOrder }
-            next[swapIdx] = { ...next[swapIdx], order_index: aOrder }
-            // PATCH both (fire and forget)
-            fetch(`/api/planner/milestones/${next[idx].id}`, {
+            const [moved] = next.splice(dragIndex, 1)
+            next.splice(dropIdx, 0, moved)
+            const updated = next.map((m, i) => ({ ...m, order_index: i }))
+            updated.forEach(m => fetch(`/api/planner/milestones/${m.id}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ order_index: bOrder }),
-            })
-            fetch(`/api/planner/milestones/${next[swapIdx].id}`, {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ order_index: aOrder }),
-            })
-            return next.sort((a, b) => a.order_index - b.order_index)
+                body: JSON.stringify({ order_index: m.order_index }),
+            }))
+            return updated
         })
+        setDragIndex(null)
+        setDragOverIndex(null)
+    }, [dragIndex])
+
+    const handleDragEnd = useCallback(() => {
+        setDragIndex(null)
+        setDragOverIndex(null)
     }, [])
 
     const handleAddMilestone = async (e: React.FormEvent) => {
@@ -566,9 +578,18 @@ export default function PlannerPage({ params }: { params: Promise<{ id: string }
                             {milestones.map((ms, idx) => {
                                 const overdue = !ms.is_completed && isDueDateOverdue(ms.due_date)
                                 return (
-                                    <div key={ms.id} className={styles.milestoneItem}>
+                                    <div
+                                        key={ms.id}
+                                        className={`${styles.milestoneItem} ${dragOverIndex === idx ? styles.dragOver : ''} ${dragIndex === idx ? styles.dragging : ''}`}
+                                        draggable
+                                        onDragStart={() => handleDragStart(idx)}
+                                        onDragOver={e => handleDragOver(e, idx)}
+                                        onDrop={() => handleDrop(idx)}
+                                        onDragEnd={handleDragEnd}
+                                    >
                                         <div className={`${styles.milestoneDot} ${ms.is_completed ? styles.completed : styles.pending}`} />
                                         <div className={`${styles.milestoneBody} ${ms.is_completed ? styles.completed : ''}`}>
+                                            <span className={styles.dragHandle} title="드래그로 순서 변경">⠿</span>
                                             <button
                                                 className={`${styles.milestoneCheck} ${ms.is_completed ? styles.checked : ''}`}
                                                 onClick={() => handleToggleMilestone(ms)}
@@ -585,20 +606,6 @@ export default function PlannerPage({ params }: { params: Promise<{ id: string }
                                                         {formatDate(ms.due_date)}{overdue ? ' (기한 초과)' : ''}
                                                     </p>
                                                 )}
-                                            </div>
-                                            <div className={styles.orderButtons}>
-                                                <button
-                                                    className={styles.orderBtn}
-                                                    onClick={() => handleMoveMilestone(ms.id, 'up')}
-                                                    disabled={idx === 0}
-                                                    title="위로"
-                                                >↑</button>
-                                                <button
-                                                    className={styles.orderBtn}
-                                                    onClick={() => handleMoveMilestone(ms.id, 'down')}
-                                                    disabled={idx === milestones.length - 1}
-                                                    title="아래로"
-                                                >↓</button>
                                             </div>
                                             <button
                                                 className={styles.deleteButton}
