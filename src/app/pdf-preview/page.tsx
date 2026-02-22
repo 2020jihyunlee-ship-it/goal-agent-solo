@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { downloadPdf } from '@/lib/pdf'
 
@@ -82,6 +82,14 @@ export default function PdfPreviewPage() {
 }
 
 function PdfTemplate({ data }: { data: typeof SAMPLE & { userName: string } }) {
+    const [isMobile, setIsMobile] = useState(false)
+    useEffect(() => {
+        const check = () => setIsMobile(window.innerWidth < 680)
+        check()
+        window.addEventListener('resize', check)
+        return () => window.removeEventListener('resize', check)
+    }, [])
+
     return (
         <div
             id="pdf-preview-template"
@@ -100,7 +108,7 @@ function PdfTemplate({ data }: { data: typeof SAMPLE & { userName: string } }) {
             <div style={{ height: '5px', background: 'linear-gradient(90deg, #6d28d9, #3b82f6, #06b6d4)' }} />
 
             {/* 헤더 */}
-            <div style={{ background: 'linear-gradient(135deg, #1e0a3c 0%, #2d1557 50%, #1e3a5f 100%)', padding: '28px 48px 24px', color: '#fff' }}>
+            <div style={{ background: 'linear-gradient(135deg, #1e0a3c 0%, #2d1557 50%, #1e3a5f 100%)', padding: isMobile ? '20px 20px 18px' : '28px 48px 24px', color: '#fff' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                     <div>
                         <div style={{ fontSize: '9px', letterSpacing: '4px', color: 'rgba(255,255,255,0.5)', marginBottom: '8px', fontWeight: 600 }}>KINGCLE EXPANSION OS · GOAL AGENT</div>
@@ -118,7 +126,7 @@ function PdfTemplate({ data }: { data: typeof SAMPLE & { userName: string } }) {
                 </div>
             </div>
 
-            <div style={{ padding: '32px 48px' }}>
+            <div style={{ padding: isMobile ? '20px 20px' : '32px 48px' }}>
 
                 {/* 핵심 목표 */}
                 <div style={{ marginBottom: '28px' }}>
@@ -167,7 +175,7 @@ function PdfTemplate({ data }: { data: typeof SAMPLE & { userName: string } }) {
                         <div style={{ width: '3px', height: '18px', background: '#6d28d9', borderRadius: '2px' }} />
                         <div style={{ fontSize: '13px', fontWeight: 700, color: '#1a1a2e' }}>동기 분석 — 나를 움직이는 힘</div>
                     </div>
-                    <div style={{ display: 'flex', gap: '12px' }}>
+                    <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: '12px' }}>
                         <div style={{ flex: 1, border: '1.5px solid #ede9fe', borderRadius: '10px', overflow: 'hidden' }}>
                             <div style={{ padding: '10px 16px', background: '#6d28d9' }}>
                                 <div style={{ fontSize: '10px', fontWeight: 700, color: '#fff', letterSpacing: '1px' }}>내적 동기 (Intrinsic)</div>
@@ -202,8 +210,8 @@ function PdfTemplate({ data }: { data: typeof SAMPLE & { userName: string } }) {
                             { label: '목표설정방법 (Specificity)', score: data.competency_scores.specificity, color: '#0891b2' },
                             { label: '구체화 (Action Planning)', score: data.competency_scores.action_planning, color: '#059669' },
                         ].map(item => (
-                            <div key={item.label} style={{ marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                <div style={{ width: '160px', flexShrink: 0, fontSize: '11px', color: '#444', fontWeight: 500 }}>{item.label}</div>
+                            <div key={item.label} style={{ marginBottom: isMobile ? '16px' : '12px', display: 'flex', flexDirection: isMobile ? 'column' : 'row', alignItems: isMobile ? 'flex-start' : 'center', gap: isMobile ? '6px' : '12px' }}>
+                                <div style={{ width: isMobile ? '100%' : '160px', flexShrink: 0, fontSize: '12px', color: '#444', fontWeight: 600 }}>{item.label}</div>
                                 <div style={{ flex: 1, height: '10px', background: '#e8e8f0', borderRadius: '5px', overflow: 'hidden' }}>
                                     <div style={{ height: '100%', width: `${item.score}%`, background: item.color, borderRadius: '5px' }} />
                                 </div>
@@ -229,7 +237,7 @@ function PdfTemplate({ data }: { data: typeof SAMPLE & { userName: string } }) {
                         <div style={{ width: '3px', height: '18px', background: '#6d28d9', borderRadius: '2px' }} />
                         <div style={{ fontSize: '13px', fontWeight: 700, color: '#1a1a2e' }}>분석 결과</div>
                     </div>
-                    <div style={{ display: 'flex', gap: '10px' }}>
+                    <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: '10px' }}>
                         {[
                             { title: '강점', emoji: '✅', items: data.analysis.strengths, bg: '#f0fdf4', header: '#16a34a', border: '#bbf7d0', textColor: '#14532d' },
                             { title: '개선점', emoji: '🔍', items: data.analysis.improvements, bg: '#fff7ed', header: '#ea580c', border: '#fed7aa', textColor: '#7c2d12' },
