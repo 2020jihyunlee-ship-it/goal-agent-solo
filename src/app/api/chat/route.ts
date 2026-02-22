@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { chat, summarizeGoal } from '@/lib/gemini'
 
+export const maxDuration = 60
+
 export async function POST(request: NextRequest) {
     try {
         const { messages, userMessage } = await request.json()
