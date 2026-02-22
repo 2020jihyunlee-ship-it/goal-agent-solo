@@ -84,12 +84,16 @@ export default function NewSessionPage() {
     }, [isDragging])
 
     const handleDownloadPdf = async () => {
+        if (!finalSummary) {
+            alert('목표 설정을 완료한 후 PDF를 다운로드할 수 있습니다.')
+            return
+        }
         setIsDownloading(true)
         try {
-            const dateStr = new Date().toISOString().split('T')[0]
+            const dateStr = new Date().toLocaleDateString('ko-KR').replace(/\. /g, '-').replace('.', '')
             await downloadPdf({
-                filename: `KINGCLE_G-STAR_Report_${dateStr}.pdf`,
-                elementId: 'session-workspace' // Capture whole workspace instead of only chat
+                filename: `KINGCLE_목표설정_리포트_${dateStr}.pdf`,
+                elementId: 'pdf-report'
             })
         } finally {
             setIsDownloading(false)
@@ -420,6 +424,218 @@ export default function NewSessionPage() {
                     </div>
                 </aside>
             </div>
+            {/* ===== 숨겨진 PDF 리포트 템플릿 (프리미엄) ===== */}
+            {finalSummary && (
+                <div
+                    id="pdf-report"
+                    style={{
+                        position: 'fixed',
+                        left: '-9999px',
+                        top: 0,
+                        width: '794px',
+                        background: '#ffffff',
+                        color: '#1a1a2e',
+                        fontFamily: '"Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", sans-serif',
+                        fontSize: '13px',
+                        lineHeight: '1.6',
+                        border: '3px solid transparent',
+                        backgroundClip: 'padding-box',
+                    }}
+                >
+                    {/* ── 최상단 컬러 라인 ── */}
+                    <div style={{ height: '5px', background: 'linear-gradient(90deg, #6d28d9, #3b82f6, #06b6d4)' }} />
+
+                    {/* ── 헤더 ── */}
+                    <div style={{ background: 'linear-gradient(135deg, #1e0a3c 0%, #2d1557 50%, #1e3a5f 100%)', padding: '36px 48px 32px', color: '#fff', position: 'relative', overflow: 'hidden' }}>
+                        {/* 배경 장식 원 */}
+                        <div style={{ position: 'absolute', top: '-40px', right: '-40px', width: '180px', height: '180px', borderRadius: '50%', background: 'rgba(109,40,217,0.2)', pointerEvents: 'none' }} />
+                        <div style={{ position: 'absolute', bottom: '-30px', right: '120px', width: '100px', height: '100px', borderRadius: '50%', background: 'rgba(59,130,246,0.15)', pointerEvents: 'none' }} />
+                        <div style={{ position: 'relative' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                                <div>
+                                    <div style={{ fontSize: '9px', letterSpacing: '4px', color: 'rgba(255,255,255,0.5)', marginBottom: '8px', fontWeight: 600 }}>KINGCLE EXPANSION OS · GOAL AGENT</div>
+                                    <div style={{ fontSize: '28px', fontWeight: 900, letterSpacing: '0.5px', marginBottom: '4px' }}>목표설정 리포트</div>
+                                    <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.55)', letterSpacing: '1px' }}>G-STAR ENGINE · AI Goal Coaching</div>
+                                </div>
+                                <div style={{ textAlign: 'right' }}>
+                                    <div style={{ display: 'inline-block', padding: '6px 14px', background: 'rgba(255,255,255,0.1)', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.15)', marginBottom: '8px' }}>
+                                        <div style={{ fontSize: '12px', fontWeight: 700, color: 'rgba(255,255,255,0.9)' }}>{userName || '사용자'}님</div>
+                                    </div>
+                                    <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.45)' }}>
+                                        {new Date().toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' })}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style={{ padding: '32px 48px' }}>
+
+                        {/* ── 핵심 목표 카드 ── */}
+                        <div style={{ marginBottom: '28px', position: 'relative' }}>
+                            <div style={{ padding: '24px 28px', background: 'linear-gradient(135deg, #faf5ff, #eff6ff)', border: '1.5px solid rgba(109,40,217,0.3)', borderRadius: '12px', position: 'relative', overflow: 'hidden' }}>
+                                <div style={{ position: 'absolute', top: 0, left: 0, width: '4px', height: '100%', background: 'linear-gradient(180deg, #6d28d9, #3b82f6)', borderRadius: '12px 0 0 12px' }} />
+                                <div style={{ paddingLeft: '8px' }}>
+                                    <div style={{ fontSize: '9px', fontWeight: 700, color: '#6d28d9', letterSpacing: '2px', marginBottom: '10px' }}>나의 SMART 목표</div>
+                                    <div style={{ fontSize: '18px', fontWeight: 800, color: '#1a1a2e', lineHeight: 1.5, marginBottom: '14px' }}>
+                                        {finalSummary.summary}
+                                    </div>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', paddingTop: '12px', borderTop: '1px solid rgba(109,40,217,0.12)' }}>
+                                        <div style={{ width: '20px', height: '20px', borderRadius: '50%', background: 'rgba(109,40,217,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                                            <span style={{ fontSize: '10px' }}>💬</span>
+                                        </div>
+                                        <div style={{ fontSize: '11px', color: '#666', fontStyle: 'italic' }}>
+                                            처음 표현한 바람: "{finalSummary.original_goal}"
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* ── SMART 세부 내용 ── */}
+                        <div style={{ marginBottom: '28px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px' }}>
+                                <div style={{ width: '3px', height: '18px', background: '#6d28d9', borderRadius: '2px' }} />
+                                <div style={{ fontSize: '13px', fontWeight: 700, color: '#1a1a2e', letterSpacing: '0.3px' }}>SMART 목표 세부 내용</div>
+                            </div>
+                            <div style={{ border: '1px solid #e8e8f0', borderRadius: '10px', overflow: 'hidden' }}>
+                                {[
+                                    { key: 'S', label: '구체적 (Specific)', value: finalSummary.smart_specific, bg: '#f5f3ff', color: '#6d28d9', border: '#ede9fe' },
+                                    { key: 'M', label: '측정가능 (Measurable)', value: finalSummary.smart_measurable, bg: '#eff6ff', color: '#2563eb', border: '#dbeafe' },
+                                    { key: 'A', label: '달성가능 (Achievable)', value: finalSummary.smart_achievable, bg: '#ecfeff', color: '#0891b2', border: '#cffafe' },
+                                    { key: 'R', label: '관련성 (Relevant)', value: finalSummary.smart_relevant, bg: '#f0fdf4', color: '#16a34a', border: '#dcfce7' },
+                                    { key: 'T', label: '기한 (Time-bound)', value: finalSummary.smart_time_bound, bg: '#fffbeb', color: '#d97706', border: '#fef3c7' },
+                                ].map((item, idx) => (
+                                    <div key={item.key} style={{ display: 'flex', alignItems: 'stretch', borderBottom: idx < 4 ? '1px solid #f0f0f5' : 'none' }}>
+                                        <div style={{ width: '48px', background: item.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, borderRight: `1px solid ${item.border}` }}>
+                                            <div style={{ width: '26px', height: '26px', background: item.color, color: '#fff', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 900 }}>{item.key}</div>
+                                        </div>
+                                        <div style={{ flex: 1, padding: '10px 16px' }}>
+                                            <div style={{ fontSize: '9px', fontWeight: 700, color: item.color, letterSpacing: '1px', marginBottom: '3px' }}>{item.label}</div>
+                                            <div style={{ fontSize: '12px', color: '#333', lineHeight: 1.55 }}>{item.value || '-'}</div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* ── 동기 분석 ── */}
+                        <div style={{ marginBottom: '28px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px' }}>
+                                <div style={{ width: '3px', height: '18px', background: '#6d28d9', borderRadius: '2px' }} />
+                                <div style={{ fontSize: '13px', fontWeight: 700, color: '#1a1a2e' }}>동기 분석 — 나를 움직이는 힘</div>
+                            </div>
+                            <div style={{ display: 'flex', gap: '12px' }}>
+                                <div style={{ flex: 1, border: '1.5px solid #ede9fe', borderRadius: '10px', overflow: 'hidden' }}>
+                                    <div style={{ padding: '10px 16px', background: '#6d28d9' }}>
+                                        <div style={{ fontSize: '10px', fontWeight: 700, color: '#fff', letterSpacing: '1px' }}>내적 동기 (Intrinsic)</div>
+                                        <div style={{ fontSize: '9px', color: 'rgba(255,255,255,0.65)', marginTop: '2px' }}>자아실현 · 성장 · 가치 · 의미</div>
+                                    </div>
+                                    <div style={{ padding: '14px 16px', background: '#faf5ff' }}>
+                                        <div style={{ fontSize: '12px', color: '#3b1f6b', lineHeight: 1.75 }}>
+                                            {finalSummary.intrinsic_motivation || finalSummary.root_cause || '-'}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div style={{ flex: 1, border: '1.5px solid #dbeafe', borderRadius: '10px', overflow: 'hidden' }}>
+                                    <div style={{ padding: '10px 16px', background: '#2563eb' }}>
+                                        <div style={{ fontSize: '10px', fontWeight: 700, color: '#fff', letterSpacing: '1px' }}>외적 동기 (Extrinsic)</div>
+                                        <div style={{ fontSize: '9px', color: 'rgba(255,255,255,0.65)', marginTop: '2px' }}>인정 · 결과 · 보상 · 기여</div>
+                                    </div>
+                                    <div style={{ padding: '14px 16px', background: '#eff6ff' }}>
+                                        <div style={{ fontSize: '12px', color: '#1e3a6b', lineHeight: 1.75 }}>
+                                            {finalSummary.extrinsic_motivation || '-'}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* ── 역량 점수 ── */}
+                        <div style={{ marginBottom: '28px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px' }}>
+                                <div style={{ width: '3px', height: '18px', background: '#6d28d9', borderRadius: '2px' }} />
+                                <div style={{ fontSize: '13px', fontWeight: 700, color: '#1a1a2e' }}>목표설정 역량 점수</div>
+                            </div>
+                            <div style={{ padding: '20px 24px', border: '1px solid #e8e8f0', borderRadius: '10px', background: '#fafafa' }}>
+                                {[
+                                    { label: '자기이해 (Self-Awareness)', score: finalSummary.competency_scores?.self_awareness || 0, color: '#6d28d9' },
+                                    { label: '문제 정의 (Problem Definition)', score: finalSummary.competency_scores?.problem_definition || 0, color: '#2563eb' },
+                                    { label: '목표설정방법 (Specificity)', score: finalSummary.competency_scores?.specificity || 0, color: '#0891b2' },
+                                    { label: '구체화 (Action Planning)', score: finalSummary.competency_scores?.action_planning || 0, color: '#059669' },
+                                ].map(item => (
+                                    <div key={item.label} style={{ marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                        <div style={{ width: '160px', flexShrink: 0, fontSize: '11px', color: '#444', fontWeight: 500 }}>{item.label}</div>
+                                        <div style={{ flex: 1, height: '10px', background: '#e8e8f0', borderRadius: '5px', overflow: 'hidden' }}>
+                                            <div style={{ height: '100%', width: `${item.score}%`, background: item.color, borderRadius: '5px', transition: 'width 0.3s' }} />
+                                        </div>
+                                        <div style={{ width: '36px', flexShrink: 0, textAlign: 'right', fontSize: '12px', fontWeight: 700, color: item.color }}>{item.score}</div>
+                                    </div>
+                                ))}
+                                <div style={{ marginTop: '16px', paddingTop: '14px', borderTop: '1.5px solid #e0e0ee', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <div>
+                                        <div style={{ fontSize: '11px', color: '#666', marginBottom: '2px' }}>종합 역량 점수</div>
+                                        <div style={{ fontSize: '10px', color: '#999' }}>100점 만점 · AI 분석 기반</div>
+                                    </div>
+                                    <div style={{ textAlign: 'right' }}>
+                                        <div style={{ fontSize: '36px', fontWeight: 900, color: '#6d28d9', lineHeight: 1 }}>{finalSummary.competency_scores?.total || 0}</div>
+                                        <div style={{ fontSize: '11px', color: '#999' }}>/ 100</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* ── 분석 결과 ── */}
+                        <div style={{ marginBottom: '28px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px' }}>
+                                <div style={{ width: '3px', height: '18px', background: '#6d28d9', borderRadius: '2px' }} />
+                                <div style={{ fontSize: '13px', fontWeight: 700, color: '#1a1a2e' }}>분석 결과</div>
+                            </div>
+                            <div style={{ display: 'flex', gap: '10px' }}>
+                                {[
+                                    { title: '강점', emoji: '✅', items: finalSummary.analysis?.strengths || [], bg: '#f0fdf4', header: '#16a34a', border: '#bbf7d0', textColor: '#14532d' },
+                                    { title: '개선점', emoji: '🔍', items: finalSummary.analysis?.improvements || [], bg: '#fff7ed', header: '#ea580c', border: '#fed7aa', textColor: '#7c2d12' },
+                                    { title: '다음 단계', emoji: '🚀', items: finalSummary.analysis?.next_steps || [], bg: '#eff6ff', header: '#2563eb', border: '#bfdbfe', textColor: '#1e3a5f' },
+                                ].map(col => (
+                                    <div key={col.title} style={{ flex: 1, border: `1.5px solid ${col.border}`, borderRadius: '10px', overflow: 'hidden' }}>
+                                        <div style={{ padding: '10px 14px', background: col.header }}>
+                                            <div style={{ fontSize: '11px', fontWeight: 700, color: '#fff' }}>{col.emoji} {col.title}</div>
+                                        </div>
+                                        <div style={{ padding: '12px 14px', background: col.bg, minHeight: '80px' }}>
+                                            {col.items.map((s: string, i: number) => (
+                                                <div key={i} style={{ display: 'flex', gap: '6px', marginBottom: '6px', alignItems: 'flex-start' }}>
+                                                    <div style={{ width: '5px', height: '5px', borderRadius: '50%', background: col.header, flexShrink: 0, marginTop: '5px' }} />
+                                                    <div style={{ fontSize: '11px', color: col.textColor, lineHeight: 1.55 }}>{s}</div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* ── 코칭 멘트 ── */}
+                        <div style={{ marginBottom: '4px', padding: '24px 28px', background: 'linear-gradient(135deg, #1e0a3c, #1e3a5f)', borderRadius: '12px', position: 'relative', overflow: 'hidden' }}>
+                            <div style={{ position: 'absolute', top: '10px', left: '20px', fontSize: '60px', color: 'rgba(255,255,255,0.06)', fontFamily: 'Georgia, serif', lineHeight: 1, pointerEvents: 'none' }}>"</div>
+                            <div style={{ position: 'relative' }}>
+                                <div style={{ fontSize: '10px', fontWeight: 700, color: 'rgba(167,139,250,1)', letterSpacing: '2px', marginBottom: '12px' }}>💪 코칭 멘트 — 끝까지 달성하는 법</div>
+                                <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.88)', lineHeight: 2, fontStyle: 'italic' }}>
+                                    {finalSummary.coaching_message || '지금 이 순간 발견한 진짜 동기를 기억하세요. 당신은 이 목표를 달성할 충분한 이유와 능력을 갖고 있습니다. 작은 실행이 쌓여 큰 변화가 됩니다.'}
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    {/* ── 하단 컬러 라인 + 푸터 ── */}
+                    <div style={{ height: '3px', background: 'linear-gradient(90deg, #6d28d9, #3b82f6, #06b6d4)' }} />
+                    <div style={{ padding: '14px 48px', background: '#f9f9fc', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div style={{ fontSize: '10px', color: '#aaa', letterSpacing: '0.5px' }}>© 2026 Kingcle Expansion OS · All Rights Reserved</div>
+                        <div style={{ fontSize: '10px', color: '#aaa' }}>Powered by G-STAR ENGINE · Gemini AI</div>
+                    </div>
+                </div>
+            )}
+
             {/* 관리자 데모 버튼 (하단 좌측, 반투명) */}
             <button
                 className={styles.adminButton}

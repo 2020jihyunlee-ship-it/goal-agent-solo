@@ -149,12 +149,15 @@ JSON 형식:
 {
   "original_goal": "처음 표현한 바람",
   "root_cause": "사용자가 스스로 발견한 핵심 동기",
+  "intrinsic_motivation": "대화에서 발견된 내적 동기 - 자아실현, 성장, 가치, 의미, 즐거움 등 내면에서 나오는 원동력을 2~3문장으로 구체적으로 설명",
+  "extrinsic_motivation": "대화에서 발견된 외적 동기 - 인정, 보상, 결과, 타인을 위한 것, 사회적 기여 등 외부에서 오는 원동력을 2~3문장으로 설명. 외적 동기가 약하면 솔직하게 기술",
   "smart_specific": "구체적 내용",
   "smart_measurable": "측정 기준",
   "smart_achievable": "달성 가능성",
   "smart_relevant": "중요성/관련성",
   "smart_time_bound": "목표 기한",
   "summary": "사용자가 선택한 최종 목표 한 문장",
+  "coaching_message": "이 목표를 끝까지 달성하기 위한 개인화된 코칭 멘트 3~4문장. 대화에서 발견된 구체적인 동기와 강점을 언급하며, 장애물을 극복하는 실질적 조언과 따뜻한 격려를 담을 것",
   "competency_scores": {
     "total": 0,
     "problem_definition": 0,
