@@ -32,6 +32,7 @@ export default function NewSessionPage() {
     const [userEmail, setUserEmail] = useState<string>('')
     const [isLimitReached, setIsLimitReached] = useState(false)
     const [sessionCount, setSessionCount] = useState<number>(0)
+    const [isUnlimited, setIsUnlimited] = useState(false)
     const [waitlistDone, setWaitlistDone] = useState(false)
     const [waitlistLoading, setWaitlistLoading] = useState(false)
     const [splitPercent, setSplitPercent] = useState(50)
@@ -107,10 +108,11 @@ export default function NewSessionPage() {
 
             // 이번 달 완료 세션 수 확인 (서버 API 통해 RLS 우회)
             const res = await fetch('/api/session/count')
-            const { count } = await res.json()
+            const { count, unlimited } = await res.json()
             setSessionCount(count)
+            if (unlimited) setIsUnlimited(true)
 
-            if (count >= 3) {
+            if (!unlimited && count >= 3) {
                 setIsLimitReached(true)
                 return
             }
@@ -317,14 +319,22 @@ export default function NewSessionPage() {
                         </div>
                     )}
                     <div className={styles.sessionQuota}>
-                        <span className={styles.quotaDots}>
-                            {[0, 1, 2].map(i => (
-                                <span key={i} className={i < sessionCount ? styles.quotaDotUsed : styles.quotaDotFree} />
-                            ))}
-                        </span>
-                        <span className={styles.quotaText}>
-                            이번 달 {Math.max(0, 3 - sessionCount)}회 남음
-                        </span>
+                        {isUnlimited ? (
+                            <span className={styles.quotaText} style={{ color: 'var(--color-primary-light)' }}>
+                                ∞ 무제한
+                            </span>
+                        ) : (
+                            <>
+                                <span className={styles.quotaDots}>
+                                    {[0, 1, 2].map(i => (
+                                        <span key={i} className={i < sessionCount ? styles.quotaDotUsed : styles.quotaDotFree} />
+                                    ))}
+                                </span>
+                                <span className={styles.quotaText}>
+                                    이번 달 {Math.max(0, 3 - sessionCount)}회 남음
+                                </span>
+                            </>
+                        )}
                     </div>
                     <button
                         className={styles.pdfButton}

@@ -12,7 +12,7 @@ export async function GET() {
     // 관리자 계정은 세션 제한 없음
     const ADMIN_EMAILS = ['2020jihyunlee@gmail.com']
     if (ADMIN_EMAILS.includes(user.email ?? '')) {
-        return NextResponse.json({ count: 0 })
+        return NextResponse.json({ count: 0, unlimited: true })
     }
 
     const startOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString()
