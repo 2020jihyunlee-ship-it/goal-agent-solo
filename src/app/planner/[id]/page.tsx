@@ -4,7 +4,6 @@ import { use, useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
-import { downloadPdf } from '@/lib/pdf'
 import styles from './page.module.css'
 
 interface Milestone {
@@ -133,7 +132,6 @@ export default function PlannerPage({ params }: { params: Promise<{ id: string }
 
     const [isSmartExpanded, setIsSmartExpanded] = useState(false)
     const [copySuccess, setCopySuccess] = useState(false)
-    const [isDownloading, setIsDownloading] = useState(false)
 
     // Milestone form
     const [showAddMilestone, setShowAddMilestone] = useState(false)
@@ -421,17 +419,6 @@ export default function PlannerPage({ params }: { params: Promise<{ id: string }
         setTimeout(() => setCopySuccess(false), 2000)
     }
 
-    const handleDownloadPdf = async () => {
-        setIsDownloading(true)
-        try {
-            await downloadPdf({
-                filename: `planner_${sessionId.slice(0, 8)}.pdf`,
-                elementId: 'planner-content',
-            })
-        } finally {
-            setIsDownloading(false)
-        }
-    }
 
     if (loading) {
         return (
@@ -474,13 +461,6 @@ export default function PlannerPage({ params }: { params: Promise<{ id: string }
                         onClick={handleCopyLink}
                     >
                         {copySuccess ? '✅ 복사됨' : '🔗 링크복사'}
-                    </button>
-                    <button
-                        className={styles.pdfButton}
-                        onClick={handleDownloadPdf}
-                        disabled={isDownloading}
-                    >
-                        {isDownloading ? '처리 중...' : '📄 PDF'}
                     </button>
                 </div>
             </header>
