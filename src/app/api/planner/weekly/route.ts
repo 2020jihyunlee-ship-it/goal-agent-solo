@@ -28,9 +28,16 @@ export async function POST(request: NextRequest) {
 
     const { session_id, task_date, title, order_index } = await request.json()
 
+    // week_start 계산 (월요일 기준, NOT NULL 컬럼)
+    const d = new Date(task_date)
+    const day = d.getUTCDay()
+    const diff = d.getUTCDate() - day + (day === 0 ? -6 : 1)
+    d.setUTCDate(diff)
+    const week_start = d.toISOString().split('T')[0]
+
     const { data, error } = await supabase
         .from('planner_weekly_tasks')
-        .insert({ session_id, task_date, title, order_index: order_index ?? 0 })
+        .insert({ session_id, task_date, week_start, title, order_index: order_index ?? 0 })
         .select()
         .single()
 

@@ -304,6 +304,31 @@ export default function PlannerPage({ params }: { params: Promise<{ id: string }
         await fetch(`/api/planner/milestones/${id}`, { method: 'DELETE' })
     }, [])
 
+    const handleMoveMilestone = useCallback(async (id: string, direction: 'up' | 'down') => {
+        setMilestones(prev => {
+            const idx = prev.findIndex(m => m.id === id)
+            const swapIdx = direction === 'up' ? idx - 1 : idx + 1
+            if (swapIdx < 0 || swapIdx >= prev.length) return prev
+            const next = [...prev]
+            const aOrder = next[idx].order_index
+            const bOrder = next[swapIdx].order_index
+            next[idx] = { ...next[idx], order_index: bOrder }
+            next[swapIdx] = { ...next[swapIdx], order_index: aOrder }
+            // PATCH both (fire and forget)
+            fetch(`/api/planner/milestones/${next[idx].id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ order_index: bOrder }),
+            })
+            fetch(`/api/planner/milestones/${next[swapIdx].id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ order_index: aOrder }),
+            })
+            return next.sort((a, b) => a.order_index - b.order_index)
+        })
+    }, [])
+
     const handleAddMilestone = async (e: React.FormEvent) => {
         e.preventDefault()
         if (!newMilestoneTitle.trim()) return
@@ -516,7 +541,7 @@ export default function PlannerPage({ params }: { params: Promise<{ id: string }
                             {milestones.length === 0 && !showAddMilestone && (
                                 <p className={styles.emptyText}>월단위 목표를 추가해보세요.</p>
                             )}
-                            {milestones.map(ms => {
+                            {milestones.map((ms, idx) => {
                                 const overdue = !ms.is_completed && isDueDateOverdue(ms.due_date)
                                 return (
                                     <div key={ms.id} className={styles.milestoneItem}>
@@ -538,6 +563,20 @@ export default function PlannerPage({ params }: { params: Promise<{ id: string }
                                                         {formatDate(ms.due_date)}{overdue ? ' (기한 초과)' : ''}
                                                     </p>
                                                 )}
+                                            </div>
+                                            <div className={styles.orderButtons}>
+                                                <button
+                                                    className={styles.orderBtn}
+                                                    onClick={() => handleMoveMilestone(ms.id, 'up')}
+                                                    disabled={idx === 0}
+                                                    title="위로"
+                                                >↑</button>
+                                                <button
+                                                    className={styles.orderBtn}
+                                                    onClick={() => handleMoveMilestone(ms.id, 'down')}
+                                                    disabled={idx === milestones.length - 1}
+                                                    title="아래로"
+                                                >↓</button>
                                             </div>
                                             <button
                                                 className={styles.deleteButton}

@@ -11,12 +11,13 @@ export async function PATCH(
     if (!user) return NextResponse.json({ error: '인증이 필요합니다' }, { status: 401 })
 
     const body = await request.json()
-    const { is_completed, title, due_date } = body
+    const { is_completed, title, due_date, order_index } = body
 
     const updateData: Record<string, unknown> = {}
     if (is_completed !== undefined) updateData.is_completed = is_completed
     if (title !== undefined) updateData.title = title
     if (due_date !== undefined) updateData.due_date = due_date
+    if (order_index !== undefined) updateData.order_index = order_index
 
     const { data, error } = await supabase
         .from('planner_milestones')
