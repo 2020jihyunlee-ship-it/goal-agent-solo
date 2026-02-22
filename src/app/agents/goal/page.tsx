@@ -463,7 +463,6 @@ export default function NewSessionPage() {
                                         {new Date().toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' })}
                                     </div>
                                 </div>
-                            </div>
                         </div>
                     </div>
 
