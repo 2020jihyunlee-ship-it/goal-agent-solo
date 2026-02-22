@@ -732,64 +732,88 @@
     gap: var(--space-sm);
 }
 
-/* ===== Date Navigator (4번 섹션) ===== */
-.dateNav {
+/* ===== Week Day Grid (4번 섹션) ===== */
+.weekNavRow {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: var(--space-sm) 0;
     margin-bottom: var(--space-md);
     gap: var(--space-sm);
 }
 
-.dateNavBtn {
-    width: 36px;
-    height: 36px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: var(--font-size-lg);
+.weekNavLabel {
+    font-size: var(--font-size-sm);
+    font-weight: 600;
     color: var(--color-text-secondary);
-    background: var(--color-bg-glass);
+}
+
+.weekDayGrid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: var(--space-xs);
+    margin-bottom: var(--space-md);
+}
+
+.weekDayBtn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: var(--space-sm) var(--space-xs);
+    background: var(--color-bg-card);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-lg);
     cursor: pointer;
     transition: all var(--transition-fast);
-    flex-shrink: 0;
+    position: relative;
+    min-width: 0;
 }
 
-.dateNavBtn:hover {
-    color: var(--color-text-primary);
-    border-color: var(--color-border-focus);
-    background: rgba(255, 255, 255, 0.08);
+.weekDayBtn:hover {
+    border-color: rgba(139, 92, 246, 0.4);
+    background: rgba(139, 92, 246, 0.06);
 }
 
-.dateLabel {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.weekDayBtn.selectedDay {
+    background: rgba(139, 92, 246, 0.15);
+    border-color: rgba(139, 92, 246, 0.6);
+    box-shadow: 0 0 12px rgba(139, 92, 246, 0.2);
+}
+
+.weekDayBtn.todayDay .weekDayNum {
+    color: var(--color-primary-light);
+}
+
+.weekDayName {
+    font-size: 11px;
+    color: var(--color-text-muted);
+    font-weight: 500;
+}
+
+.weekDayBtn.selectedDay .weekDayName {
+    color: var(--color-primary-light);
+}
+
+.weekDayNum {
     font-size: var(--font-size-base);
     font-weight: 600;
     color: var(--color-text-primary);
-    cursor: pointer;
-    position: relative;
-    padding: var(--space-xs) var(--space-md);
-    border-radius: var(--radius-lg);
-    transition: background var(--transition-fast);
-    gap: var(--space-xs);
+    line-height: 1;
 }
 
-.dateLabel:hover {
-    background: rgba(255, 255, 255, 0.05);
+.todayDot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--color-primary-light);
 }
 
-.hiddenDateInput {
-    position: absolute;
-    opacity: 0;
-    width: 0;
-    height: 0;
-    pointer-events: none;
+.selectedDateLabel {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-md);
+    padding-bottom: var(--space-sm);
+    border-bottom: 1px solid var(--color-border);
 }
 
 .doneItem {

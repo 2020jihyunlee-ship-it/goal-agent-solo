@@ -55,12 +55,16 @@ interface Goal {
     created_at: string
 }
 
+function toDateStr(d: Date): string {
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
+
 function getWeekStart(dateStr: string): string {
     const d = new Date(dateStr + 'T00:00:00')
     const day = d.getDay()
     const diff = d.getDate() - day + (day === 0 ? -6 : 1)
     d.setDate(diff)
-    return d.toISOString().split('T')[0]
+    return toDateStr(d)
 }
 
 function formatWeekLabel(weekStart: string): string {
@@ -106,7 +110,7 @@ function isDueDateOverdue(dateStr: string | null): boolean {
 function offsetDate(dateStr: string, days: number): string {
     const d = new Date(dateStr + 'T00:00:00')
     d.setDate(d.getDate() + days)
-    return d.toISOString().split('T')[0]
+    return toDateStr(d)
 }
 
 export default function PlannerPage({ params }: { params: Promise<{ id: string }> }) {
@@ -652,30 +656,49 @@ export default function PlannerPage({ params }: { params: Promise<{ id: string }
                         </button>
                     </div>
 
-                    {/* 날짜 네비게이터 */}
-                    <div className={styles.dateNav}>
+                    {/* 주 네비게이터 */}
+                    <div className={styles.weekNavRow}>
                         <button
-                            className={styles.dateNavBtn}
-                            onClick={() => setSelectedDate(d => offsetDate(d, -1))}
+                            className={styles.weekNavBtn}
+                            onClick={() => setSelectedDate(d => offsetDate(d, -7))}
                         >
-                            ‹
+                            ‹ 이전 주
                         </button>
-                        <label className={styles.dateLabel}>
-                            <input
-                                type="date"
-                                className={styles.hiddenDateInput}
-                                value={selectedDate}
-                                onChange={e => setSelectedDate(e.target.value)}
-                            />
-                            {formatDayLabel(selectedDate)}
-                        </label>
+                        <span className={styles.weekNavLabel}>{formatWeekLabel(currentWeekStart)}</span>
                         <button
-                            className={styles.dateNavBtn}
-                            onClick={() => setSelectedDate(d => offsetDate(d, 1))}
+                            className={styles.weekNavBtn}
+                            onClick={() => setSelectedDate(d => offsetDate(d, 7))}
                         >
-                            ›
+                            다음 주 ›
                         </button>
                     </div>
+
+                    {/* 7일 요일 선택 */}
+                    <div className={styles.weekDayGrid}>
+                        {(() => {
+                            const DAY_NAMES = ['월', '화', '수', '목', '금', '토', '일']
+                            return Array.from({ length: 7 }, (_, i) => {
+                                const date = offsetDate(currentWeekStart, i)
+                                const dayNum = new Date(date + 'T00:00:00').getDate()
+                                const isToday = date === todayStr
+                                const isSelected = date === selectedDate
+                                return (
+                                    <button
+                                        key={date}
+                                        className={`${styles.weekDayBtn} ${isSelected ? styles.selectedDay : ''} ${isToday ? styles.todayDay : ''}`}
+                                        onClick={() => setSelectedDate(date)}
+                                    >
+                                        <span className={styles.weekDayName}>{DAY_NAMES[i]}</span>
+                                        <span className={styles.weekDayNum}>{dayNum}</span>
+                                        {isToday && <span className={styles.todayDot} />}
+                                    </button>
+                                )
+                            })
+                        })()}
+                    </div>
+
+                    {/* 선택된 날짜 표시 */}
+                    <p className={styles.selectedDateLabel}>{formatDayLabel(selectedDate)}</p>
 
                     {/* 완료율 */}
                     {dailyTasks.length > 0 && (
