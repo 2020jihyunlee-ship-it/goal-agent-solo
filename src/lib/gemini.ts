@@ -89,6 +89,25 @@ export function getGeminiModel() {
     })
 }
 
+async function withRetry<T>(fn: () => Promise<T>, retries = 3, delayMs = 2000): Promise<T> {
+    for (let i = 0; i < retries; i++) {
+        try {
+            return await fn()
+        } catch (err: any) {
+            const isRetryable = err?.message?.includes('429') ||
+                err?.message?.toLowerCase().includes('rate') ||
+                err?.message?.toLowerCase().includes('fetch') ||
+                err?.message?.toLowerCase().includes('timeout')
+            if (i < retries - 1 && isRetryable) {
+                await new Promise(r => setTimeout(r, delayMs * (i + 1)))
+                continue
+            }
+            throw err
+        }
+    }
+    throw new Error('최대 재시도 횟수 초과')
+}
+
 export async function chat(history: { role: string; content: string }[], userMessage: string) {
     const model = getGeminiModel()
 
@@ -104,12 +123,11 @@ export async function chat(history: { role: string; content: string }[], userMes
         validHistory = validHistory.slice(1)
     }
 
-    const chat = model.startChat({
-        history: validHistory
+    return withRetry(async () => {
+        const chatSession = model.startChat({ history: validHistory })
+        const result = await chatSession.sendMessage(userMessage)
+        return result.response.text()
     })
-
-    const result = await chat.sendMessage(userMessage)
-    return result.response.text()
 }
 
 export async function summarizeGoal(conversation: { role: string; content: string }[]) {
@@ -156,8 +174,10 @@ ${conversation.map(m => `${m.role === 'user' ? '사용자' : '코치'}: ${m.cont
 
 반드시 순수 JSON만 응답하세요. total은 4개 점수의 평균입니다.`
 
-    const result = await model.generateContent(prompt)
-    const text = result.response.text()
+    const text = await withRetry(async () => {
+        const result = await model.generateContent(prompt)
+        return result.response.text()
+    })
 
     try {
         const jsonMatch = text.match(/\{[\s\S]*\}/)
