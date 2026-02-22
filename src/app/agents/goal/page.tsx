@@ -192,7 +192,7 @@ export default function NewSessionPage() {
             })
             const { id } = await response.json()
             if (id) {
-                router.push(`/session/${id}`)
+                router.push(`/planner/${id}`)
             }
         } catch (error) {
             console.error('Save Error:', error)
