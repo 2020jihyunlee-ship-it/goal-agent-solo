@@ -49,6 +49,8 @@
   line-height: 1.15;
   color: var(--color-text-primary);
   letter-spacing: -0.02em;
+  word-break: keep-all;
+  overflow-wrap: break-word;
 }
 
 .subtitle {
@@ -213,6 +215,8 @@
   font-weight: 700;
   color: var(--color-text-primary);
   margin-bottom: var(--space-md);
+  word-break: keep-all;
+  overflow-wrap: break-word;
 }
 
 .sectionSubtitle {
@@ -706,6 +710,10 @@
   .pricingGrid {
     grid-template-columns: 1fr;
     max-width: 440px;
+  }
+
+  .sectionTitle {
+    font-size: var(--font-size-2xl);
   }
 }
 
