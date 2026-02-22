@@ -43,10 +43,11 @@ export default function NewSessionPage() {
     const [showAdminModal, setShowAdminModal] = useState(false)
     const [adminPw, setAdminPw] = useState('')
     const [adminError, setAdminError] = useState('')
+    const [adminUnlocked, setAdminUnlocked] = useState(false)
 
     const handleAdminAccess = () => {
         if (adminPw === 'kingclcoach1234') {
-            window.location.href = '/planner/a1b2c3d4-0000-0000-0000-000000000001'
+            setAdminUnlocked(true)
         } else {
             setAdminError('비밀번호가 올바르지 않습니다')
         }
@@ -56,6 +57,7 @@ export default function NewSessionPage() {
         setShowAdminModal(false)
         setAdminPw('')
         setAdminError('')
+        setAdminUnlocked(false)
     }
 
     const handleResizerMouseDown = useCallback((e: React.MouseEvent) => {
@@ -648,22 +650,69 @@ export default function NewSessionPage() {
             {showAdminModal && (
                 <div className={styles.adminOverlay} onClick={closeAdminModal}>
                     <div className={styles.adminModal} onClick={e => e.stopPropagation()}>
-                        <h3 className={styles.adminTitle}>관리자 데모 플래너</h3>
-                        <p className={styles.adminDesc}>관리자 비밀번호를 입력하세요</p>
-                        <input
-                            type="password"
-                            className="input"
-                            value={adminPw}
-                            onChange={e => { setAdminPw(e.target.value); setAdminError('') }}
-                            onKeyDown={e => e.key === 'Enter' && handleAdminAccess()}
-                            placeholder="비밀번호"
-                            autoFocus
-                        />
-                        {adminError && <p className={styles.adminError}>{adminError}</p>}
-                        <div className={styles.adminActions}>
-                            <button className={styles.adminCancel} onClick={closeAdminModal}>취소</button>
-                            <button className={styles.adminConfirm} onClick={handleAdminAccess}>입장</button>
-                        </div>
+                        {!adminUnlocked ? (
+                            <>
+                                <h3 className={styles.adminTitle}>관리자 데모</h3>
+                                <p className={styles.adminDesc}>관리자 비밀번호를 입력하세요</p>
+                                <input
+                                    type="password"
+                                    className="input"
+                                    value={adminPw}
+                                    onChange={e => { setAdminPw(e.target.value); setAdminError('') }}
+                                    onKeyDown={e => e.key === 'Enter' && handleAdminAccess()}
+                                    placeholder="비밀번호"
+                                    autoFocus
+                                />
+                                {adminError && <p className={styles.adminError}>{adminError}</p>}
+                                <div className={styles.adminActions}>
+                                    <button className={styles.adminCancel} onClick={closeAdminModal}>취소</button>
+                                    <button className={styles.adminConfirm} onClick={handleAdminAccess}>확인</button>
+                                </div>
+                            </>
+                        ) : (
+                            <>
+                                <div style={{ textAlign: 'center', marginBottom: '4px' }}>
+                                    <div style={{ fontSize: '22px', marginBottom: '6px' }}>✅</div>
+                                    <h3 className={styles.adminTitle} style={{ marginBottom: '4px' }}>관리자 데모</h3>
+                                    <p className={styles.adminDesc}>둘 중 선택하세요</p>
+                                </div>
+                                <button
+                                    onClick={() => { window.location.href = '/planner/a1b2c3d4-0000-0000-0000-000000000001' }}
+                                    style={{
+                                        width: '100%', padding: '16px 18px',
+                                        fontSize: '14px', fontWeight: 600, color: '#fff',
+                                        background: 'linear-gradient(135deg, rgba(139,92,246,0.2), rgba(59,130,246,0.12))',
+                                        border: '1px solid rgba(139,92,246,0.4)',
+                                        borderRadius: '12px', cursor: 'pointer',
+                                        display: 'flex', alignItems: 'center', gap: '12px', textAlign: 'left',
+                                    }}
+                                >
+                                    <span style={{ fontSize: '24px' }}>📋</span>
+                                    <div>
+                                        <div style={{ fontWeight: 700, marginBottom: '2px' }}>꿈 실현 플래너</div>
+                                        <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.45)', fontWeight: 400 }}>마일스톤 · 주간목표 · 실행로그</div>
+                                    </div>
+                                </button>
+                                <button
+                                    onClick={() => { window.location.href = '/pdf-preview' }}
+                                    style={{
+                                        width: '100%', padding: '16px 18px',
+                                        fontSize: '14px', fontWeight: 600, color: '#fff',
+                                        background: 'linear-gradient(135deg, rgba(109,40,217,0.2), rgba(30,58,95,0.2))',
+                                        border: '1px solid rgba(109,40,217,0.4)',
+                                        borderRadius: '12px', cursor: 'pointer',
+                                        display: 'flex', alignItems: 'center', gap: '12px', textAlign: 'left',
+                                    }}
+                                >
+                                    <span style={{ fontSize: '24px' }}>📄</span>
+                                    <div>
+                                        <div style={{ fontWeight: 700, marginBottom: '2px' }}>프리미엄 PDF 리포트</div>
+                                        <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.45)', fontWeight: 400 }}>목표설정 분석 · 동기 · 코칭 멘트</div>
+                                    </div>
+                                </button>
+                                <button className={styles.adminCancel} onClick={closeAdminModal} style={{ width: '100%', textAlign: 'center' }}>닫기</button>
+                            </>
+                        )}
                     </div>
                 </div>
             )}
