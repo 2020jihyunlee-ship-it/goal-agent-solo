@@ -25,6 +25,32 @@ interface Log {
     created_at: string
 }
 
+interface WeeklyTask {
+    id: string
+    session_id: string
+    week_start: string
+    title: string
+    is_completed: boolean
+    order_index: number
+    created_at: string
+}
+
+function getWeekStart(offset = 0): string {
+    const d = new Date()
+    d.setDate(d.getDate() + offset * 7)
+    const day = d.getDay()
+    const diff = d.getDate() - day + (day === 0 ? -6 : 1)
+    d.setDate(diff)
+    return d.toISOString().split('T')[0]
+}
+
+function formatWeekLabel(weekStart: string): string {
+    const d = new Date(weekStart)
+    const month = d.getMonth() + 1
+    const weekNum = Math.ceil(d.getDate() / 7)
+    return `${d.getFullYear()}년 ${month}월 ${weekNum}주차`
+}
+
 interface Goal {
     summary: string
     smart_specific: string
@@ -90,6 +116,14 @@ export default function PlannerPage({ params }: { params: Promise<{ id: string }
     const [newLogDate, setNewLogDate] = useState(new Date().toISOString().split('T')[0])
     const [addingLog, setAddingLog] = useState(false)
 
+    // Weekly sprint
+    const [weekOffset, setWeekOffset] = useState(0)
+    const currentWeekStart = getWeekStart(weekOffset)
+    const [weeklyTasks, setWeeklyTasks] = useState<WeeklyTask[]>([])
+    const [showAddWeekly, setShowAddWeekly] = useState(false)
+    const [newWeeklyTitle, setNewWeeklyTitle] = useState('')
+    const [addingWeekly, setAddingWeekly] = useState(false)
+
     const completedCount = milestones.filter(m => m.is_completed).length
     const totalCount = milestones.length
     const progressPercent = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0
@@ -144,6 +178,52 @@ export default function PlannerPage({ params }: { params: Promise<{ id: string }
         }
         init()
     }, [sessionId, router])
+
+    // Weekly tasks fetch (주차 변경 시마다)
+    useEffect(() => {
+        if (!sessionId) return
+        fetch(`/api/planner/weekly?sessionId=${sessionId}&weekStart=${currentWeekStart}`)
+            .then(r => r.ok ? r.json() : [])
+            .then(setWeeklyTasks)
+    }, [sessionId, currentWeekStart])
+
+    const handleToggleWeekly = useCallback(async (task: WeeklyTask) => {
+        const newVal = !task.is_completed
+        setWeeklyTasks(prev => prev.map(t => t.id === task.id ? { ...t, is_completed: newVal } : t))
+        await fetch(`/api/planner/weekly/${task.id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ is_completed: newVal }),
+        })
+    }, [])
+
+    const handleDeleteWeekly = useCallback(async (id: string) => {
+        setWeeklyTasks(prev => prev.filter(t => t.id !== id))
+        await fetch(`/api/planner/weekly/${id}`, { method: 'DELETE' })
+    }, [])
+
+    const handleAddWeekly = async (e: React.FormEvent) => {
+        e.preventDefault()
+        if (!newWeeklyTitle.trim()) return
+        setAddingWeekly(true)
+        const res = await fetch('/api/planner/weekly', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                session_id: sessionId,
+                week_start: currentWeekStart,
+                title: newWeeklyTitle.trim(),
+                order_index: weeklyTasks.length,
+            }),
+        })
+        if (res.ok) {
+            const created = await res.json()
+            setWeeklyTasks(prev => [...prev, created])
+            setNewWeeklyTitle('')
+            setShowAddWeekly(false)
+        }
+        setAddingWeekly(false)
+    }
 
     const handleToggleMilestone = useCallback(async (ms: Milestone) => {
         const newVal = !ms.is_completed
@@ -439,6 +519,91 @@ export default function PlannerPage({ params }: { params: Promise<{ id: string }
                                     disabled={addingMilestone || !newMilestoneTitle.trim()}
                                 >
                                     {addingMilestone ? '추가 중...' : '추가'}
+                                </button>
+                            </div>
+                        </form>
+                    )}
+                </section>
+
+                {/* WEEKLY SPRINT SECTION */}
+                <section className={styles.section}>
+                    <div className={styles.sectionHeader}>
+                        <h2 className={styles.sectionTitle}>📋 이번 주 목표</h2>
+                        <button className={styles.addButton} onClick={() => setShowAddWeekly(p => !p)}>
+                            + 추가
+                        </button>
+                    </div>
+
+                    {/* 주차 네비게이션 */}
+                    <div className={styles.weekNav}>
+                        <button className={styles.weekNavBtn} onClick={() => setWeekOffset(p => p - 1)}>‹ 이전</button>
+                        <span className={styles.weekLabel}>{formatWeekLabel(currentWeekStart)}</span>
+                        <button
+                            className={styles.weekNavBtn}
+                            onClick={() => setWeekOffset(p => p + 1)}
+                            disabled={weekOffset >= 0}
+                        >
+                            다음 ›
+                        </button>
+                    </div>
+
+                    {/* 완료율 바 */}
+                    {weeklyTasks.length > 0 && (
+                        <div className={styles.weekProgress}>
+                            <div className={styles.weekProgressInfo}>
+                                <span>{weeklyTasks.filter(t => t.is_completed).length} / {weeklyTasks.length} 완료</span>
+                                <span>{Math.round(weeklyTasks.filter(t => t.is_completed).length / weeklyTasks.length * 100)}%</span>
+                            </div>
+                            <div className={styles.progressTrack}>
+                                <div
+                                    className={styles.progressFill}
+                                    style={{ width: `${Math.round(weeklyTasks.filter(t => t.is_completed).length / weeklyTasks.length * 100)}%` }}
+                                />
+                            </div>
+                        </div>
+                    )}
+
+                    {/* 태스크 목록 */}
+                    <div className={styles.weeklyList}>
+                        {weeklyTasks.length === 0 && !showAddWeekly && (
+                            <p className={styles.emptyText}>이번 주 목표를 추가해보세요.</p>
+                        )}
+                        {weeklyTasks.map(task => (
+                            <div key={task.id} className={`${styles.weeklyItem} ${task.is_completed ? styles.completed : ''}`}>
+                                <button
+                                    className={`${styles.milestoneCheck} ${task.is_completed ? styles.checked : ''}`}
+                                    onClick={() => handleToggleWeekly(task)}
+                                >
+                                    {task.is_completed ? '✓' : ''}
+                                </button>
+                                <span className={`${styles.weeklyTitle} ${task.is_completed ? styles.strikethrough : ''}`}>
+                                    {task.title}
+                                </span>
+                                <button
+                                    className={styles.deleteButton}
+                                    onClick={() => handleDeleteWeekly(task.id)}
+                                    title="삭제"
+                                >
+                                    🗑
+                                </button>
+                            </div>
+                        ))}
+                    </div>
+
+                    {showAddWeekly && (
+                        <form className={styles.inlineForm} onSubmit={handleAddWeekly}>
+                            <input
+                                className="input"
+                                placeholder="이번 주 목표 입력"
+                                value={newWeeklyTitle}
+                                onChange={e => setNewWeeklyTitle(e.target.value)}
+                                onKeyDown={e => e.key === 'Enter' && handleAddWeekly(e as any)}
+                                autoFocus
+                            />
+                            <div className={styles.formActions} style={{ marginTop: 'var(--space-sm)' }}>
+                                <button type="button" className={styles.cancelButton} onClick={() => setShowAddWeekly(false)}>취소</button>
+                                <button type="submit" className={styles.submitButton} disabled={addingWeekly || !newWeeklyTitle.trim()}>
+                                    {addingWeekly ? '추가 중...' : '추가'}
                                 </button>
                             </div>
                         </form>
