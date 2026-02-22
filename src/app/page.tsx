@@ -69,7 +69,7 @@ export default function Home() {
         <div className={styles.heroContent}>
           <div className={styles.badge}>
             <span className={styles.badgeDot}></span>
-            AI 목표설정 코치 · Goal Agent
+            AI 목표설정 코치 · Goal Agent Planner
           </div>
 
           <h1 className={styles.title}>
@@ -204,7 +204,7 @@ export default function Home() {
 
       {/* Footer */}
       <footer className={styles.footer}>
-        <p>© 2026 Kingcle Expansion OS · Goal Agent</p>
+        <p>© 2026 Kingcle Expansion OS · Goal Agent Planner</p>
         <div className={styles.footerLinks}>
           <AdminDemoButton />
           <Link href="/signup">무료 회원가입</Link>

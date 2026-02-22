@@ -448,12 +448,8 @@ export default function NewSessionPage() {
                     <div style={{ height: '5px', background: 'linear-gradient(90deg, #6d28d9, #3b82f6, #06b6d4)' }} />
 
                     {/* ── 헤더 ── */}
-                    <div style={{ background: 'linear-gradient(135deg, #1e0a3c 0%, #2d1557 50%, #1e3a5f 100%)', padding: '36px 48px 32px', color: '#fff', position: 'relative', overflow: 'hidden' }}>
-                        {/* 배경 장식 원 */}
-                        <div style={{ position: 'absolute', top: '-40px', right: '-40px', width: '180px', height: '180px', borderRadius: '50%', background: 'rgba(109,40,217,0.2)', pointerEvents: 'none' }} />
-                        <div style={{ position: 'absolute', bottom: '-30px', right: '120px', width: '100px', height: '100px', borderRadius: '50%', background: 'rgba(59,130,246,0.15)', pointerEvents: 'none' }} />
-                        <div style={{ position: 'relative' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                    <div style={{ background: 'linear-gradient(135deg, #1e0a3c 0%, #2d1557 50%, #1e3a5f 100%)', padding: '28px 48px 24px', color: '#fff' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                                 <div>
                                     <div style={{ fontSize: '9px', letterSpacing: '4px', color: 'rgba(255,255,255,0.5)', marginBottom: '8px', fontWeight: 600 }}>KINGCLE EXPANSION OS · GOAL AGENT</div>
                                     <div style={{ fontSize: '28px', fontWeight: 900, letterSpacing: '0.5px', marginBottom: '4px' }}>목표설정 리포트</div>

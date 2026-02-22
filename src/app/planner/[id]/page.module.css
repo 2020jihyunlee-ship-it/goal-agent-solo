@@ -986,27 +986,167 @@
 
 /* ===== Responsive ===== */
 @media (max-width: 768px) {
+    /* 헤더 */
     .header {
-        padding: var(--space-md);
+        padding: 10px var(--space-md);
+        gap: var(--space-xs);
+    }
+    .headerTitle {
+        font-size: 15px;
+    }
+    .backButton {
+        font-size: 12px;
+    }
+    .copyButton {
+        padding: 6px 10px;
+        font-size: 12px;
     }
 
+    /* 진행률 */
+    .progressSection {
+        padding: var(--space-sm) var(--space-md);
+    }
+
+    /* 콘텐츠 */
     .content {
         padding: var(--space-md);
+        gap: var(--space-lg);
     }
 
-    .headerTitle {
+    /* 목표 카드 */
+    .goalCard {
+        padding: var(--space-md);
+    }
+    .goalSummary {
         font-size: var(--font-size-base);
     }
+    .goalIcon {
+        font-size: 1.5rem;
+    }
 
+    /* SMART 아코디언 */
     .smartGrid {
         grid-template-columns: 1fr;
+        gap: var(--space-sm);
     }
 
+    /* 섹션 헤더 */
+    .sectionHeader {
+        margin-bottom: var(--space-md);
+    }
+    .sectionTitle {
+        font-size: var(--font-size-base);
+    }
+    .addButton {
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+
+    /* 마일스톤 타임라인 */
+    .timeline {
+        padding-left: var(--space-lg);
+    }
+    .milestoneBody {
+        gap: var(--space-sm);
+        padding: var(--space-sm) var(--space-md);
+    }
+    .dragHandle {
+        display: none; /* 모바일에서 드래그 핸들 숨김 */
+    }
+    .deleteButton {
+        opacity: 1; /* 모바일에서 항상 표시 */
+    }
+    .milestoneTitle {
+        font-size: var(--font-size-sm);
+    }
+
+    /* 주간 목표 */
+    .weeklyGoalBox {
+        padding: var(--space-md);
+    }
+    .goalDisplay {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-sm);
+    }
+    .editGoalBtn {
+        width: 100%;
+        text-align: center;
+        justify-content: center;
+    }
+
+    /* 주간 날짜 그리드 */
+    .weekNavRow {
+        flex-wrap: wrap;
+        gap: var(--space-xs);
+    }
+    .weekDayGrid {
+        gap: 4px;
+    }
+    .weekDayBtn {
+        padding: 6px 2px;
+    }
+    .weekDayName {
+        font-size: 10px;
+    }
+    .weekDayNum {
+        font-size: 13px;
+    }
+
+    /* 일일 일정 아이템 */
+    .weeklyItem {
+        flex-wrap: wrap;
+        gap: var(--space-sm);
+        padding: var(--space-sm) var(--space-md);
+    }
+    .weeklyTitle {
+        font-size: var(--font-size-sm);
+    }
+    .taskTime {
+        order: -1;  /* 시간을 제목 앞으로 */
+    }
+
+    /* 시간 선택 */
+    .timeRow {
+        flex-wrap: wrap;
+    }
+    .timeSelect {
+        min-width: 90px;
+    }
+
+    /* 인라인 폼 */
     .formRow {
         flex-direction: column;
+        gap: var(--space-sm);
     }
-
     .dateInput {
         width: 100%;
+    }
+    .formActions {
+        justify-content: stretch;
+    }
+    .submitButton,
+    .cancelButton {
+        flex: 1;
+        text-align: center;
+        justify-content: center;
+    }
+
+    /* 로그 아이템 */
+    .logItem {
+        flex-direction: column;
+        gap: var(--space-xs);
+        padding: var(--space-sm) var(--space-md);
+    }
+    .logDate {
+        font-size: 11px;
+        min-width: unset;
+    }
+    .logContent {
+        font-size: var(--font-size-sm);
+    }
+    .logItem .deleteButton {
+        opacity: 1;
+        align-self: flex-end;
     }
 }
