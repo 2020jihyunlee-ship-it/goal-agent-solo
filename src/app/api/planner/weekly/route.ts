@@ -15,6 +15,7 @@ export async function GET(request: NextRequest) {
         .select('*')
         .eq('session_id', sessionId)
         .eq('task_date', taskDate)
+        .order('start_time', { ascending: true, nullsFirst: false })
         .order('order_index', { ascending: true })
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
@@ -26,7 +27,7 @@ export async function POST(request: NextRequest) {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return NextResponse.json({ error: '인증이 필요합니다' }, { status: 401 })
 
-    const { session_id, task_date, title, order_index } = await request.json()
+    const { session_id, task_date, title, order_index, start_time, end_time } = await request.json()
 
     // week_start 계산 (월요일 기준, NOT NULL 컬럼)
     const d = new Date(task_date)
@@ -37,7 +38,12 @@ export async function POST(request: NextRequest) {
 
     const { data, error } = await supabase
         .from('planner_weekly_tasks')
-        .insert({ session_id, task_date, week_start, title, order_index: order_index ?? 0 })
+        .insert({
+            session_id, task_date, week_start, title,
+            order_index: order_index ?? 0,
+            start_time: start_time || null,
+            end_time: end_time || null,
+        })
         .select()
         .single()
 

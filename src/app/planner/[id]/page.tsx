@@ -32,8 +32,16 @@ interface DailyTask {
     title: string
     is_completed: boolean
     order_index: number
+    start_time: string | null
+    end_time: string | null
     created_at: string
 }
+
+const TIME_OPTIONS = Array.from({ length: 48 }, (_, i) => {
+    const h = Math.floor(i / 2)
+    const m = i % 2 === 0 ? '00' : '30'
+    return `${String(h).padStart(2, '0')}:${m}`
+})
 
 interface WeeklyGoal {
     id: string
@@ -151,6 +159,8 @@ export default function PlannerPage({ params }: { params: Promise<{ id: string }
     const [dailyTasks, setDailyTasks] = useState<DailyTask[]>([])
     const [showAddDaily, setShowAddDaily] = useState(false)
     const [newDailyTitle, setNewDailyTitle] = useState('')
+    const [newStartTime, setNewStartTime] = useState('')
+    const [newEndTime, setNewEndTime] = useState('')
     const [addingDaily, setAddingDaily] = useState(false)
 
     const completedCount = milestones.filter(m => m.is_completed).length
@@ -278,12 +288,24 @@ export default function PlannerPage({ params }: { params: Promise<{ id: string }
                 task_date: selectedDate,
                 title: newDailyTitle.trim(),
                 order_index: dailyTasks.length,
+                start_time: newStartTime || null,
+                end_time: newEndTime || null,
             }),
         })
         if (res.ok) {
             const created = await res.json()
-            setDailyTasks(prev => [...prev, created])
+            setDailyTasks(prev => {
+                const next = [...prev, created]
+                return next.sort((a, b) => {
+                    if (!a.start_time && !b.start_time) return 0
+                    if (!a.start_time) return 1
+                    if (!b.start_time) return -1
+                    return a.start_time.localeCompare(b.start_time)
+                })
+            })
             setNewDailyTitle('')
+            setNewStartTime('')
+            setNewEndTime('')
             setShowAddDaily(false)
         }
         setAddingDaily(false)
@@ -768,6 +790,12 @@ export default function PlannerPage({ params }: { params: Promise<{ id: string }
                                 >
                                     {task.is_completed ? '✓' : ''}
                                 </button>
+                                {task.start_time && (
+                                    <span className={styles.taskTime}>
+                                        {task.start_time.slice(0, 5)}
+                                        {task.end_time ? ` ~ ${task.end_time.slice(0, 5)}` : ''}
+                                    </span>
+                                )}
                                 <span className={`${styles.weeklyTitle} ${task.is_completed ? styles.strikethrough : ''}`}>
                                     {task.title}
                                 </span>
@@ -789,11 +817,29 @@ export default function PlannerPage({ params }: { params: Promise<{ id: string }
                                 placeholder="일정 입력"
                                 value={newDailyTitle}
                                 onChange={e => setNewDailyTitle(e.target.value)}
-                                onKeyDown={e => e.key === 'Enter' && handleAddDaily(e as any)}
                                 autoFocus
                             />
+                            <div className={styles.timeRow}>
+                                <select
+                                    className={styles.timeSelect}
+                                    value={newStartTime}
+                                    onChange={e => setNewStartTime(e.target.value)}
+                                >
+                                    <option value="">시작 시간</option>
+                                    {TIME_OPTIONS.map(t => <option key={t} value={t}>{t}</option>)}
+                                </select>
+                                <span className={styles.timeSep}>~</span>
+                                <select
+                                    className={styles.timeSelect}
+                                    value={newEndTime}
+                                    onChange={e => setNewEndTime(e.target.value)}
+                                >
+                                    <option value="">종료 시간</option>
+                                    {TIME_OPTIONS.map(t => <option key={t} value={t}>{t}</option>)}
+                                </select>
+                            </div>
                             <div className={styles.formActions} style={{ marginTop: 'var(--space-sm)' }}>
-                                <button type="button" className={styles.cancelButton} onClick={() => setShowAddDaily(false)}>취소</button>
+                                <button type="button" className={styles.cancelButton} onClick={() => { setShowAddDaily(false); setNewStartTime(''); setNewEndTime('') }}>취소</button>
                                 <button type="submit" className={styles.submitButton} disabled={addingDaily || !newDailyTitle.trim()}>
                                     {addingDaily ? '추가 중...' : '추가'}
                                 </button>

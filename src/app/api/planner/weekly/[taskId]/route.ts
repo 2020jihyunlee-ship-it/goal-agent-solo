@@ -14,6 +14,8 @@ export async function PATCH(
     const updateData: Record<string, unknown> = {}
     if (body.is_completed !== undefined) updateData.is_completed = body.is_completed
     if (body.title !== undefined) updateData.title = body.title
+    if (body.start_time !== undefined) updateData.start_time = body.start_time || null
+    if (body.end_time !== undefined) updateData.end_time = body.end_time || null
 
     const { data, error } = await supabase
         .from('planner_weekly_tasks')
