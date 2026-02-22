@@ -467,7 +467,7 @@ export default function PlannerPage({ params }: { params: Promise<{ id: string }
             {/* HEADER */}
             <header className={styles.header}>
                 <Link href="/" className={styles.backButton}>← 홈</Link>
-                <h1 className={`${styles.headerTitle} text-gradient`}>나의 플래너</h1>
+                <h1 className={`${styles.headerTitle} text-gradient`}>꿈 실현 플래너</h1>
                 <div className={styles.headerActions}>
                     <button
                         className={`${styles.copyButton} ${copySuccess ? styles.copySuccess : ''}`}

@@ -38,6 +38,25 @@ export default function NewSessionPage() {
     const [isDragging, setIsDragging] = useState(false)
     const contentRef = useRef<HTMLDivElement>(null)
 
+    // 관리자 데모 모달
+    const [showAdminModal, setShowAdminModal] = useState(false)
+    const [adminPw, setAdminPw] = useState('')
+    const [adminError, setAdminError] = useState('')
+
+    const handleAdminAccess = () => {
+        if (adminPw === 'kingclcoach1234') {
+            window.location.href = '/planner/a1b2c3d4-0000-0000-0000-000000000001'
+        } else {
+            setAdminError('비밀번호가 올바르지 않습니다')
+        }
+    }
+
+    const closeAdminModal = () => {
+        setShowAdminModal(false)
+        setAdminPw('')
+        setAdminError('')
+    }
+
     const handleResizerMouseDown = useCallback((e: React.MouseEvent) => {
         e.preventDefault()
         setIsDragging(true)
@@ -391,6 +410,37 @@ export default function NewSessionPage() {
                     </div>
                 </aside>
             </div>
+            {/* 관리자 데모 버튼 (하단 좌측, 반투명) */}
+            <button
+                className={styles.adminButton}
+                onClick={() => setShowAdminModal(true)}
+            >
+                관리자 데모
+            </button>
+
+            {/* 관리자 비번 모달 */}
+            {showAdminModal && (
+                <div className={styles.adminOverlay} onClick={closeAdminModal}>
+                    <div className={styles.adminModal} onClick={e => e.stopPropagation()}>
+                        <h3 className={styles.adminTitle}>관리자 데모 플래너</h3>
+                        <p className={styles.adminDesc}>관리자 비밀번호를 입력하세요</p>
+                        <input
+                            type="password"
+                            className="input"
+                            value={adminPw}
+                            onChange={e => { setAdminPw(e.target.value); setAdminError('') }}
+                            onKeyDown={e => e.key === 'Enter' && handleAdminAccess()}
+                            placeholder="비밀번호"
+                            autoFocus
+                        />
+                        {adminError && <p className={styles.adminError}>{adminError}</p>}
+                        <div className={styles.adminActions}>
+                            <button className={styles.adminCancel} onClick={closeAdminModal}>취소</button>
+                            <button className={styles.adminConfirm} onClick={handleAdminAccess}>입장</button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </main >
     )
 }
