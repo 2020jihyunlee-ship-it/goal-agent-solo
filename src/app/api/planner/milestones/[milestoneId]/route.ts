@@ -3,8 +3,9 @@ import { createClient } from '@/lib/supabase/server'
 
 export async function PATCH(
     request: NextRequest,
-    { params }: { params: { milestoneId: string } }
+    { params }: { params: Promise<{ milestoneId: string }> }
 ) {
+    const { milestoneId } = await params
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return NextResponse.json({ error: '인증이 필요합니다' }, { status: 401 })
@@ -20,7 +21,7 @@ export async function PATCH(
     const { data, error } = await supabase
         .from('planner_milestones')
         .update(updateData)
-        .eq('id', params.milestoneId)
+        .eq('id', milestoneId)
         .select()
         .single()
 
@@ -30,8 +31,9 @@ export async function PATCH(
 
 export async function DELETE(
     request: NextRequest,
-    { params }: { params: { milestoneId: string } }
+    { params }: { params: Promise<{ milestoneId: string }> }
 ) {
+    const { milestoneId } = await params
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return NextResponse.json({ error: '인증이 필요합니다' }, { status: 401 })
@@ -39,7 +41,7 @@ export async function DELETE(
     const { error } = await supabase
         .from('planner_milestones')
         .delete()
-        .eq('id', params.milestoneId)
+        .eq('id', milestoneId)
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
     return NextResponse.json({ success: true })

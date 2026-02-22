@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { use, useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
@@ -64,9 +64,9 @@ function isDueDateOverdue(dateStr: string | null): boolean {
     return due < today
 }
 
-export default function PlannerPage({ params }: { params: { id: string } }) {
+export default function PlannerPage({ params }: { params: Promise<{ id: string }> }) {
+    const { id: sessionId } = use(params)
     const router = useRouter()
-    const sessionId = params.id
 
     const [goal, setGoal] = useState<Goal | null>(null)
     const [milestones, setMilestones] = useState<Milestone[]>([])
