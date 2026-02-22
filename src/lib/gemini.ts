@@ -84,7 +84,7 @@ export const systemPrompt = `당신은 '목표설정 코치 에이전트'입니�
 export function getGeminiModel() {
     const genAI = getGenAI();
     return genAI.getGenerativeModel({
-        model: 'gemini-2.0-flash',
+        model: 'gemini-1.5-flash',
         systemInstruction: systemPrompt
     })
 }
@@ -133,7 +133,7 @@ export async function chat(history: { role: string; content: string }[], userMes
 export async function summarizeGoal(conversation: { role: string; content: string }[]) {
     const genAI = getGenAI();
     const model = genAI.getGenerativeModel({
-        model: 'gemini-2.0-flash',
+        model: 'gemini-1.5-flash',
     })
 
     const prompt = `다음은 사용자와 목표설정 코치 에이전트의 대화 내용입니다.
