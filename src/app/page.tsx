@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import styles from './page.module.css'
 import AdminDemoButton from '@/components/AdminDemoButton'
+import HeroVisual from '@/components/HeroVisual'
 
 const pillars = [
   {
@@ -103,22 +104,7 @@ export default function Home() {
         </div>
 
         <div className={styles.heroVisual}>
-          <div className={styles.visualCard}>
-            <div className={styles.visualHeader}>
-              <span className={styles.visualDot}></span>
-              <span>AI 코치</span>
-            </div>
-            <div className={styles.visualMessages}>
-              <div className={styles.aiMsg}>"어떤 목표를 가슴에 품고 계신가요?"</div>
-              <div className={styles.userMsg}>영어를 잘하고 싶어요</div>
-              <div className={styles.aiMsg}>"지금 현재 영어 실력은 어느 수준인가요?"</div>
-              <div className={styles.userMsg}>일상 회화는 되는데 비즈니스는 어려워요</div>
-              <div className={styles.aiMsg}>"왜 비즈니스 영어가 지금 당신에게 중요한가요?"</div>
-              <div className={styles.typingDots}>
-                <span></span><span></span><span></span>
-              </div>
-            </div>
-          </div>
+          <HeroVisual />
         </div>
       </section>
 
@@ -187,6 +173,92 @@ export default function Home() {
               </div>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* Pricing Section */}
+      <section className={styles.pricingSection}>
+        <div className={styles.sectionHeader}>
+          <div className={styles.sectionBadge}>요금제</div>
+          <h2 className={styles.sectionTitle}>무료로 시작, 필요할 때 업그레이드</h2>
+          <p className={styles.sectionSubtitle}>
+            목표를 발견하는 것은 무료입니다.<br />
+            끝까지 실행하고 싶다면 프리미엄으로.
+          </p>
+        </div>
+
+        <div className={styles.pricingGrid}>
+          {/* Free Plan */}
+          <div className={styles.pricingCard}>
+            <div className={styles.planLabel}>FREE</div>
+            <div className={styles.planPrice}>
+              <span className={styles.planAmount}>₩0</span>
+              <span className={styles.planPeriod}>/ 월</span>
+            </div>
+            <p className={styles.planDesc}>목표설정 능력을 경험해보세요</p>
+            <ul className={styles.planFeatures}>
+              <li className={styles.featureItem}>
+                <span className={styles.featureIcon}>✓</span>
+                AI 코칭 세션 <strong>월 3회</strong>
+              </li>
+              <li className={styles.featureItem}>
+                <span className={styles.featureIcon}>✓</span>
+                SMART 목표 설계
+              </li>
+              <li className={styles.featureItem}>
+                <span className={styles.featureIcon}>✓</span>
+                5단계 자기이해 프로세스
+              </li>
+              <li className={`${styles.featureItem} ${styles.featureMuted}`}>
+                <span className={styles.featureIconMuted}>✕</span>
+                꿈 실현 플래너 (마일스톤·일정)
+              </li>
+              <li className={`${styles.featureItem} ${styles.featureMuted}`}>
+                <span className={styles.featureIconMuted}>✕</span>
+                프리미엄 PDF 리포트
+              </li>
+            </ul>
+            <a href="/signup" className={`btn btn-secondary ${styles.planBtn}`}>
+              무료로 시작하기
+            </a>
+          </div>
+
+          {/* Premium Plan */}
+          <div className={`${styles.pricingCard} ${styles.pricingCardPremium}`}>
+            <div className={styles.planBadge}>추천</div>
+            <div className={styles.planLabel}>PREMIUM</div>
+            <div className={styles.planPrice}>
+              <span className={styles.planAmount}>₩9,900</span>
+              <span className={styles.planPeriod}>/ 월</span>
+            </div>
+            <p className={styles.planDesc}>목표를 끝까지 실행하세요</p>
+            <ul className={styles.planFeatures}>
+              <li className={styles.featureItem}>
+                <span className={styles.featureIconPremium}>✓</span>
+                AI 코칭 세션 <strong>무제한</strong>
+              </li>
+              <li className={styles.featureItem}>
+                <span className={styles.featureIconPremium}>✓</span>
+                SMART 목표 설계
+              </li>
+              <li className={styles.featureItem}>
+                <span className={styles.featureIconPremium}>✓</span>
+                5단계 자기이해 프로세스
+              </li>
+              <li className={styles.featureItem}>
+                <span className={styles.featureIconPremium}>✓</span>
+                꿈 실현 플래너 (마일스톤·일정)
+              </li>
+              <li className={styles.featureItem}>
+                <span className={styles.featureIconPremium}>✓</span>
+                프리미엄 PDF 리포트
+              </li>
+            </ul>
+            <a href="/signup" className={`btn btn-primary ${styles.planBtn}`}>
+              프리미엄 시작하기
+            </a>
+            <p className={styles.planNote}>첫 7일 무료 체험</p>
+          </div>
         </div>
       </section>
 
