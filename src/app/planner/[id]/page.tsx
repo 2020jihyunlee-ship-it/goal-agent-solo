@@ -25,30 +25,22 @@ interface Log {
     created_at: string
 }
 
-interface WeeklyTask {
+interface DailyTask {
     id: string
     session_id: string
-    week_start: string
+    task_date: string
     title: string
     is_completed: boolean
     order_index: number
     created_at: string
 }
 
-function getWeekStart(offset = 0): string {
-    const d = new Date()
-    d.setDate(d.getDate() + offset * 7)
-    const day = d.getDay()
-    const diff = d.getDate() - day + (day === 0 ? -6 : 1)
-    d.setDate(diff)
-    return d.toISOString().split('T')[0]
-}
-
-function formatWeekLabel(weekStart: string): string {
-    const d = new Date(weekStart)
-    const month = d.getMonth() + 1
-    const weekNum = Math.ceil(d.getDate() / 7)
-    return `${d.getFullYear()}년 ${month}월 ${weekNum}주차`
+interface WeeklyGoal {
+    id: string
+    session_id: string
+    week_start: string
+    goal_text: string
+    created_at: string
 }
 
 interface Goal {
@@ -61,6 +53,27 @@ interface Goal {
     original_goal: string
     root_cause: string
     created_at: string
+}
+
+function getWeekStart(dateStr: string): string {
+    const d = new Date(dateStr + 'T00:00:00')
+    const day = d.getDay()
+    const diff = d.getDate() - day + (day === 0 ? -6 : 1)
+    d.setDate(diff)
+    return d.toISOString().split('T')[0]
+}
+
+function formatWeekLabel(weekStart: string): string {
+    const d = new Date(weekStart + 'T00:00:00')
+    const month = d.getMonth() + 1
+    const weekNum = Math.ceil(d.getDate() / 7)
+    return `${d.getFullYear()}년 ${month}월 ${weekNum}주차`
+}
+
+function formatDayLabel(dateStr: string): string {
+    const d = new Date(dateStr + 'T00:00:00')
+    const days = ['일', '월', '화', '수', '목', '금', '토']
+    return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')} (${days[d.getDay()]})`
 }
 
 function calcDDay(timeBound: string): string {
@@ -77,7 +90,7 @@ function calcDDay(timeBound: string): string {
 }
 
 function formatDate(dateStr: string): string {
-    const d = new Date(dateStr)
+    const d = new Date(dateStr + 'T00:00:00')
     return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}`
 }
 
@@ -88,6 +101,12 @@ function isDueDateOverdue(dateStr: string | null): boolean {
     const today = new Date()
     today.setHours(0, 0, 0, 0)
     return due < today
+}
+
+function offsetDate(dateStr: string, days: number): string {
+    const d = new Date(dateStr + 'T00:00:00')
+    d.setDate(d.getDate() + days)
+    return d.toISOString().split('T')[0]
 }
 
 export default function PlannerPage({ params }: { params: Promise<{ id: string }> }) {
@@ -104,30 +123,39 @@ export default function PlannerPage({ params }: { params: Promise<{ id: string }
     const [copySuccess, setCopySuccess] = useState(false)
     const [isDownloading, setIsDownloading] = useState(false)
 
-    // Add milestone form
+    // Milestone form
     const [showAddMilestone, setShowAddMilestone] = useState(false)
     const [newMilestoneTitle, setNewMilestoneTitle] = useState('')
     const [newMilestoneDue, setNewMilestoneDue] = useState('')
     const [addingMilestone, setAddingMilestone] = useState(false)
 
-    // Add log form
+    // Log form
     const [showAddLog, setShowAddLog] = useState(false)
     const [newLogContent, setNewLogContent] = useState('')
     const [newLogDate, setNewLogDate] = useState(new Date().toISOString().split('T')[0])
     const [addingLog, setAddingLog] = useState(false)
 
-    // Weekly sprint
-    const [weekOffset, setWeekOffset] = useState(0)
-    const currentWeekStart = getWeekStart(weekOffset)
-    const [weeklyTasks, setWeeklyTasks] = useState<WeeklyTask[]>([])
-    const [showAddWeekly, setShowAddWeekly] = useState(false)
-    const [newWeeklyTitle, setNewWeeklyTitle] = useState('')
-    const [addingWeekly, setAddingWeekly] = useState(false)
+    // 3번: 주간 목표
+    const [weeklyGoal, setWeeklyGoal] = useState<WeeklyGoal | null>(null)
+    const [goalText, setGoalText] = useState('')
+    const [isEditingGoal, setIsEditingGoal] = useState(false)
+    const [savingGoal, setSavingGoal] = useState(false)
+
+    // 4번: 일일 일정 (날짜별)
+    const todayStr = new Date().toISOString().split('T')[0]
+    const [selectedDate, setSelectedDate] = useState(todayStr)
+    const [dailyTasks, setDailyTasks] = useState<DailyTask[]>([])
+    const [showAddDaily, setShowAddDaily] = useState(false)
+    const [newDailyTitle, setNewDailyTitle] = useState('')
+    const [addingDaily, setAddingDaily] = useState(false)
 
     const completedCount = milestones.filter(m => m.is_completed).length
     const totalCount = milestones.length
     const progressPercent = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0
 
+    const currentWeekStart = getWeekStart(selectedDate)
+
+    // 초기 데이터 로드
     useEffect(() => {
         const init = async () => {
             const supabase = createClient()
@@ -179,17 +207,49 @@ export default function PlannerPage({ params }: { params: Promise<{ id: string }
         init()
     }, [sessionId, router])
 
-    // Weekly tasks fetch (주차 변경 시마다)
+    // 주간 목표 로드 (날짜 변경 시 주차 바뀌면 리로드)
     useEffect(() => {
         if (!sessionId) return
-        fetch(`/api/planner/weekly?sessionId=${sessionId}&weekStart=${currentWeekStart}`)
-            .then(r => r.ok ? r.json() : [])
-            .then(setWeeklyTasks)
+        fetch(`/api/planner/weekly-goals?sessionId=${sessionId}&weekStart=${currentWeekStart}`)
+            .then(r => r.ok ? r.json() : null)
+            .then(data => {
+                setWeeklyGoal(data)
+                setGoalText(data?.goal_text ?? '')
+                setIsEditingGoal(false)
+            })
     }, [sessionId, currentWeekStart])
 
-    const handleToggleWeekly = useCallback(async (task: WeeklyTask) => {
+    // 일일 일정 로드 (날짜 변경 시)
+    useEffect(() => {
+        if (!sessionId) return
+        fetch(`/api/planner/weekly?sessionId=${sessionId}&taskDate=${selectedDate}`)
+            .then(r => r.ok ? r.json() : [])
+            .then(setDailyTasks)
+    }, [sessionId, selectedDate])
+
+    const handleSaveGoal = async () => {
+        if (!goalText.trim()) return
+        setSavingGoal(true)
+        const res = await fetch('/api/planner/weekly-goals', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                session_id: sessionId,
+                week_start: currentWeekStart,
+                goal_text: goalText.trim(),
+            }),
+        })
+        if (res.ok) {
+            const saved = await res.json()
+            setWeeklyGoal(saved)
+            setIsEditingGoal(false)
+        }
+        setSavingGoal(false)
+    }
+
+    const handleToggleDaily = useCallback(async (task: DailyTask) => {
         const newVal = !task.is_completed
-        setWeeklyTasks(prev => prev.map(t => t.id === task.id ? { ...t, is_completed: newVal } : t))
+        setDailyTasks(prev => prev.map(t => t.id === task.id ? { ...t, is_completed: newVal } : t))
         await fetch(`/api/planner/weekly/${task.id}`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
@@ -197,37 +257,36 @@ export default function PlannerPage({ params }: { params: Promise<{ id: string }
         })
     }, [])
 
-    const handleDeleteWeekly = useCallback(async (id: string) => {
-        setWeeklyTasks(prev => prev.filter(t => t.id !== id))
+    const handleDeleteDaily = useCallback(async (id: string) => {
+        setDailyTasks(prev => prev.filter(t => t.id !== id))
         await fetch(`/api/planner/weekly/${id}`, { method: 'DELETE' })
     }, [])
 
-    const handleAddWeekly = async (e: React.FormEvent) => {
+    const handleAddDaily = async (e: React.FormEvent) => {
         e.preventDefault()
-        if (!newWeeklyTitle.trim()) return
-        setAddingWeekly(true)
+        if (!newDailyTitle.trim()) return
+        setAddingDaily(true)
         const res = await fetch('/api/planner/weekly', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 session_id: sessionId,
-                week_start: currentWeekStart,
-                title: newWeeklyTitle.trim(),
-                order_index: weeklyTasks.length,
+                task_date: selectedDate,
+                title: newDailyTitle.trim(),
+                order_index: dailyTasks.length,
             }),
         })
         if (res.ok) {
             const created = await res.json()
-            setWeeklyTasks(prev => [...prev, created])
-            setNewWeeklyTitle('')
-            setShowAddWeekly(false)
+            setDailyTasks(prev => [...prev, created])
+            setNewDailyTitle('')
+            setShowAddDaily(false)
         }
-        setAddingWeekly(false)
+        setAddingDaily(false)
     }
 
     const handleToggleMilestone = useCallback(async (ms: Milestone) => {
         const newVal = !ms.is_completed
-        // optimistic update
         setMilestones(prev => prev.map(m => m.id === ms.id ? { ...m, is_completed: newVal } : m))
         await fetch(`/api/planner/milestones/${ms.id}`, {
             method: 'PATCH',
@@ -337,6 +396,8 @@ export default function PlannerPage({ params }: { params: Promise<{ id: string }
 
     const dDay = calcDDay(goal.smart_time_bound)
     const dDayClass = dDay === 'D-DAY' ? styles.today : dDay.startsWith('D+') ? styles.overdue : ''
+    const dailyCompleted = dailyTasks.filter(t => t.is_completed).length
+    const dailyPercent = dailyTasks.length > 0 ? Math.round(dailyCompleted / dailyTasks.length * 100) : 0
 
     return (
         <main className={styles.main}>
@@ -365,7 +426,7 @@ export default function PlannerPage({ params }: { params: Promise<{ id: string }
             <div className={styles.progressSection}>
                 <div className={`${styles.progressInfo} ${progressPercent === 100 ? styles.complete : ''}`}>
                     {totalCount > 0
-                        ? `${completedCount} / ${totalCount} 마일스톤 완료 (${progressPercent}%)`
+                        ? `${completedCount} / ${totalCount} 월단위 목표 완료 (${progressPercent}%)`
                         : '마일스톤을 생성하는 중...'}
                 </div>
                 <div className={styles.progressTrack}>
@@ -378,7 +439,8 @@ export default function PlannerPage({ params }: { params: Promise<{ id: string }
 
             {/* CONTENT */}
             <div id="planner-content" className={styles.content}>
-                {/* GOAL CARD */}
+
+                {/* 1. GOAL CARD */}
                 <div className={styles.goalCard}>
                     <div className={styles.goalHeader}>
                         <span className={styles.goalIcon}>🎯</span>
@@ -423,10 +485,10 @@ export default function PlannerPage({ params }: { params: Promise<{ id: string }
                     </div>
                 </div>
 
-                {/* MILESTONE SECTION */}
+                {/* 2. 월단위 목표 (마일스톤) */}
                 <section className={styles.section}>
                     <div className={styles.sectionHeader}>
-                        <h2 className={styles.sectionTitle}>📅 마일스톤</h2>
+                        <h2 className={styles.sectionTitle}>📅 월단위 목표</h2>
                         <button
                             className={styles.addButton}
                             onClick={() => setShowAddMilestone(p => !p)}
@@ -442,13 +504,13 @@ export default function PlannerPage({ params }: { params: Promise<{ id: string }
                             <div className={styles.skeleton} />
                             <p className={styles.generatingText}>
                                 <span className={styles.spinner} style={{ width: 16, height: 16, borderWidth: 2 }} />
-                                AI가 마일스톤을 생성하는 중...
+                                AI가 월단위 목표를 생성하는 중...
                             </p>
                         </div>
                     ) : (
                         <div className={styles.timeline}>
                             {milestones.length === 0 && !showAddMilestone && (
-                                <p className={styles.emptyText}>마일스톤을 추가해보세요.</p>
+                                <p className={styles.emptyText}>월단위 목표를 추가해보세요.</p>
                             )}
                             {milestones.map(ms => {
                                 const overdue = !ms.is_completed && isDueDateOverdue(ms.due_date)
@@ -492,7 +554,7 @@ export default function PlannerPage({ params }: { params: Promise<{ id: string }
                             <div className={styles.formRow}>
                                 <input
                                     className="input"
-                                    placeholder="마일스톤 제목"
+                                    placeholder="월단위 목표 제목"
                                     value={newMilestoneTitle}
                                     onChange={e => setNewMilestoneTitle(e.target.value)}
                                     onKeyDown={e => e.key === 'Enter' && handleAddMilestone(e as any)}
@@ -525,54 +587,122 @@ export default function PlannerPage({ params }: { params: Promise<{ id: string }
                     )}
                 </section>
 
-                {/* WEEKLY SPRINT SECTION */}
+                {/* 3. 주간 목표 */}
                 <section className={styles.section}>
                     <div className={styles.sectionHeader}>
-                        <h2 className={styles.sectionTitle}>📋 이번 주 목표</h2>
-                        <button className={styles.addButton} onClick={() => setShowAddWeekly(p => !p)}>
+                        <h2 className={styles.sectionTitle}>📌 주간 목표</h2>
+                        <span className={styles.weekBadge}>{formatWeekLabel(currentWeekStart)}</span>
+                    </div>
+
+                    <div className={styles.weeklyGoalBox}>
+                        {isEditingGoal ? (
+                            <div className={styles.goalEditRow}>
+                                <input
+                                    className="input"
+                                    placeholder="이번 주 핵심 목표를 입력하세요"
+                                    value={goalText}
+                                    onChange={e => setGoalText(e.target.value)}
+                                    onKeyDown={e => e.key === 'Enter' && handleSaveGoal()}
+                                    autoFocus
+                                />
+                                <div className={styles.formActions} style={{ marginTop: 'var(--space-sm)' }}>
+                                    <button
+                                        type="button"
+                                        className={styles.cancelButton}
+                                        onClick={() => {
+                                            setIsEditingGoal(false)
+                                            setGoalText(weeklyGoal?.goal_text ?? '')
+                                        }}
+                                    >
+                                        취소
+                                    </button>
+                                    <button
+                                        className={styles.submitButton}
+                                        onClick={handleSaveGoal}
+                                        disabled={savingGoal || !goalText.trim()}
+                                    >
+                                        {savingGoal ? '저장 중...' : '저장'}
+                                    </button>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className={styles.goalDisplay}>
+                                {weeklyGoal?.goal_text ? (
+                                    <p className={styles.weeklyGoalText}>{weeklyGoal.goal_text}</p>
+                                ) : (
+                                    <p className={styles.emptyGoal}>이번 주 핵심 목표를 설정해보세요.</p>
+                                )}
+                                <button
+                                    className={styles.editGoalBtn}
+                                    onClick={() => setIsEditingGoal(true)}
+                                >
+                                    {weeklyGoal?.goal_text ? '✏️ 수정' : '+ 설정'}
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                </section>
+
+                {/* 4. 일일 일정 */}
+                <section className={styles.section}>
+                    <div className={styles.sectionHeader}>
+                        <h2 className={styles.sectionTitle}>📋 일일 일정</h2>
+                        <button className={styles.addButton} onClick={() => setShowAddDaily(p => !p)}>
                             + 추가
                         </button>
                     </div>
 
-                    {/* 주차 네비게이션 */}
-                    <div className={styles.weekNav}>
-                        <button className={styles.weekNavBtn} onClick={() => setWeekOffset(p => p - 1)}>‹ 이전</button>
-                        <span className={styles.weekLabel}>{formatWeekLabel(currentWeekStart)}</span>
+                    {/* 날짜 네비게이터 */}
+                    <div className={styles.dateNav}>
                         <button
-                            className={styles.weekNavBtn}
-                            onClick={() => setWeekOffset(p => p + 1)}
-                            disabled={weekOffset >= 0}
+                            className={styles.dateNavBtn}
+                            onClick={() => setSelectedDate(d => offsetDate(d, -1))}
                         >
-                            다음 ›
+                            ‹
+                        </button>
+                        <label className={styles.dateLabel}>
+                            <input
+                                type="date"
+                                className={styles.hiddenDateInput}
+                                value={selectedDate}
+                                onChange={e => setSelectedDate(e.target.value)}
+                            />
+                            {formatDayLabel(selectedDate)}
+                        </label>
+                        <button
+                            className={styles.dateNavBtn}
+                            onClick={() => setSelectedDate(d => offsetDate(d, 1))}
+                        >
+                            ›
                         </button>
                     </div>
 
-                    {/* 완료율 바 */}
-                    {weeklyTasks.length > 0 && (
+                    {/* 완료율 */}
+                    {dailyTasks.length > 0 && (
                         <div className={styles.weekProgress}>
                             <div className={styles.weekProgressInfo}>
-                                <span>{weeklyTasks.filter(t => t.is_completed).length} / {weeklyTasks.length} 완료</span>
-                                <span>{Math.round(weeklyTasks.filter(t => t.is_completed).length / weeklyTasks.length * 100)}%</span>
+                                <span>{dailyCompleted} / {dailyTasks.length} 완료</span>
+                                <span>{dailyPercent}%</span>
                             </div>
                             <div className={styles.progressTrack}>
                                 <div
                                     className={styles.progressFill}
-                                    style={{ width: `${Math.round(weeklyTasks.filter(t => t.is_completed).length / weeklyTasks.length * 100)}%` }}
+                                    style={{ width: `${dailyPercent}%` }}
                                 />
                             </div>
                         </div>
                     )}
 
-                    {/* 태스크 목록 */}
+                    {/* 일정 목록 */}
                     <div className={styles.weeklyList}>
-                        {weeklyTasks.length === 0 && !showAddWeekly && (
-                            <p className={styles.emptyText}>이번 주 목표를 추가해보세요.</p>
+                        {dailyTasks.length === 0 && !showAddDaily && (
+                            <p className={styles.emptyText}>이 날의 일정을 추가해보세요.</p>
                         )}
-                        {weeklyTasks.map(task => (
-                            <div key={task.id} className={`${styles.weeklyItem} ${task.is_completed ? styles.completed : ''}`}>
+                        {dailyTasks.map(task => (
+                            <div key={task.id} className={`${styles.weeklyItem} ${task.is_completed ? styles.doneItem : ''}`}>
                                 <button
                                     className={`${styles.milestoneCheck} ${task.is_completed ? styles.checked : ''}`}
-                                    onClick={() => handleToggleWeekly(task)}
+                                    onClick={() => handleToggleDaily(task)}
                                 >
                                     {task.is_completed ? '✓' : ''}
                                 </button>
@@ -581,7 +711,7 @@ export default function PlannerPage({ params }: { params: Promise<{ id: string }
                                 </span>
                                 <button
                                     className={styles.deleteButton}
-                                    onClick={() => handleDeleteWeekly(task.id)}
+                                    onClick={() => handleDeleteDaily(task.id)}
                                     title="삭제"
                                 >
                                     🗑
@@ -590,27 +720,27 @@ export default function PlannerPage({ params }: { params: Promise<{ id: string }
                         ))}
                     </div>
 
-                    {showAddWeekly && (
-                        <form className={styles.inlineForm} onSubmit={handleAddWeekly}>
+                    {showAddDaily && (
+                        <form className={styles.inlineForm} onSubmit={handleAddDaily}>
                             <input
                                 className="input"
-                                placeholder="이번 주 목표 입력"
-                                value={newWeeklyTitle}
-                                onChange={e => setNewWeeklyTitle(e.target.value)}
-                                onKeyDown={e => e.key === 'Enter' && handleAddWeekly(e as any)}
+                                placeholder="일정 입력"
+                                value={newDailyTitle}
+                                onChange={e => setNewDailyTitle(e.target.value)}
+                                onKeyDown={e => e.key === 'Enter' && handleAddDaily(e as any)}
                                 autoFocus
                             />
                             <div className={styles.formActions} style={{ marginTop: 'var(--space-sm)' }}>
-                                <button type="button" className={styles.cancelButton} onClick={() => setShowAddWeekly(false)}>취소</button>
-                                <button type="submit" className={styles.submitButton} disabled={addingWeekly || !newWeeklyTitle.trim()}>
-                                    {addingWeekly ? '추가 중...' : '추가'}
+                                <button type="button" className={styles.cancelButton} onClick={() => setShowAddDaily(false)}>취소</button>
+                                <button type="submit" className={styles.submitButton} disabled={addingDaily || !newDailyTitle.trim()}>
+                                    {addingDaily ? '추가 중...' : '추가'}
                                 </button>
                             </div>
                         </form>
                     )}
                 </section>
 
-                {/* LOG SECTION */}
+                {/* 5. 실행 로그 */}
                 <section className={styles.section}>
                     <div className={styles.sectionHeader}>
                         <h2 className={styles.sectionTitle}>📝 실행 로그</h2>
