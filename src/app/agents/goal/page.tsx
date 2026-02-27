@@ -46,7 +46,7 @@ export default function NewSessionPage() {
     const [adminUnlocked, setAdminUnlocked] = useState(false)
 
     const handleAdminAccess = () => {
-        if (adminPw === 'kingcl1234') {
+        if (adminPw === 'kingclcoach1234') {
             setAdminUnlocked(true)
         } else {
             setAdminError('비밀번호가 올바르지 않습니다')
